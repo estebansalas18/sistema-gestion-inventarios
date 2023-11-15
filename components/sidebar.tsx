@@ -8,7 +8,7 @@ const Sidebar = () => {
   const currentPath = router.pathname;
   const { user, error, isLoading } = useUser();
 
-  const userRole = "USER";
+  const userRole = "ADMIN";
 
   const UserRoleBadge = ({ role }: { role: string }) => {
     if (role === "ADMIN") {

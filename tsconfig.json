@@ -18,6 +18,6 @@
     },
     "types": ["node", "jest", "@testing-library/jest-dom"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/auth/[auth0]/[auth0].ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/auth/[auth0].ts"],
   "exclude": ["node_modules"]
 }
