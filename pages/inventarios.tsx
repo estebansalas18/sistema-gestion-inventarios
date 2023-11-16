@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { materiales, inventarios } from "../data/arrays";
 import Link from "next/link";
+import LineChart from "@/components/barras";
 
 const Inventarios = () => {
   const { user, error, isLoading } = useUser();
@@ -10,6 +12,29 @@ const Inventarios = () => {
   if (error) return <div>{error.message}</div>;
 
   if (user) {
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownButtonRef = useRef();
+
+    const handleDropdownToggle = () => {
+      setDropdownOpen(!dropdownOpen);
+    };
+
+    const handleOutsideClick = (event) => {
+      if (
+        dropdownButtonRef.current &&
+        !dropdownButtonRef.current.contains(event.target)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    useEffect(() => {
+      document.addEventListener("click", handleOutsideClick);
+
+      return () => {
+        document.removeEventListener("click", handleOutsideClick);
+      };
+    }, []);
     return (
       <div className="flex">
         <Sidebar />
@@ -17,9 +42,70 @@ const Inventarios = () => {
           <h1 className="text-3xl font-bold text-center mb-4">
             Gestión de Inventarios
           </h1>
-
+          <h2 className="text-xl font-bold text-center mb-4">
+            AQUI PONER EL NOMBRE DEL MATERIAL
+          </h2>
           {/* Tabla de Productos */}
           <div className="px-28 py-5 ">
+            <div className="flex justify-between pb-5">
+              <div className="relative">
+                <button
+                  id="dropdownDefaultButton"
+                  data-dropdown-toggle="dropdown"
+                  onClick={handleDropdownToggle}
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  type="button"
+                  ref={dropdownButtonRef}
+                >
+                  Seleccionar Material{" "}
+                  <svg
+                    className={`w-2.5 h-2.5 ms-3 ${
+                      dropdownOpen ? "transform rotate-180" : ""
+                    }`}
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 4 4 4-4"
+                    />
+                  </svg>
+                </button>
+                <div
+                  id="dropdown"
+                  className={`${
+                    dropdownOpen ? "block" : "hidden"
+                  } absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}
+                >
+                  <ul
+                    className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                    aria-labelledby="dropdownDefaultButton"
+                  >
+                    {materiales.map((material) => (
+                      <li key={material.id}>
+                        <a
+                          href="#"
+                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        >
+                          {material.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+              >
+                Agregar Movimiento
+              </button>
+            </div>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
               <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -42,18 +128,29 @@ const Inventarios = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      Apple MacBook Pro 17"
-                    </td>
-                    <td className="px-6 py-4">Silver</td>
-                    <td className="px-6 py-4">Laptop</td>
-                    <td className="px-6 py-4">$2999</td>
-                    <td className="px-6 py-4">Juan Esteban Salas</td>
-                  </tr>
+                  {inventarios.map((inventario) => (
+                    <tr
+                      key={inventario.id}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {inventario.name}
+                      </td>
+                      <td className="px-6 py-4">{inventario.date}</td>
+                      <td className="px-6 py-4">{inventario.entrance}</td>
+                      <td className="px-6 py-4">{inventario.exit}</td>
+                      <td className="px-6 py-4">{inventario.responsible}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+            <h1 className="text-3xl font-bold text-left mt-10">
+              Cantidad del material seleccionado: 100
+            </h1>
+            <h2 className="text-base font-semibold text-left mb-4">
+              Saldo actual
+            </h2>
           </div>
         </div>
       </div>
