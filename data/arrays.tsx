@@ -1,15 +1,3 @@
-export const inventarios = [
-  {
-    id: 1,
-    name: "Material 1",
-    date: "2023-11-15",
-    entrance: "Silver",
-    exit: "Laptop",
-    price: "$2999",
-    responsible: "Juan Esteban Salas",
-  },
-];
-
 export const inventarios_header: string[] = [
   "Identificador",
   "Fecha",
@@ -23,7 +11,7 @@ export const inventarios_fields = [
   "date",
   "entrance",
   "exit",
-  "responsible",
+  "userId",
 ];
 
 export const materiales_header: string[] = [
