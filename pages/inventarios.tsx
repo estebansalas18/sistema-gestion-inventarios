@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Sidebar from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { materiales, inventarios } from "../data/arrays";
 import Link from "next/link";
-import LineChart from "@/components/barras";
 
 const Inventarios = () => {
   const { user, error, isLoading } = useUser();
@@ -58,6 +57,7 @@ const Inventarios = () => {
                   ref={dropdownButtonRef}
                 >
                   Seleccionar Material{" "}
+                  {/* LOS ICONOS SVG SE PUEDEN CAMBIAR POR REACT-ICONS */}
                   <svg
                     className={`w-2.5 h-2.5 ms-3 ${
                       dropdownOpen ? "transform rotate-180" : ""
