@@ -1,45 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+// Inventarios.tsx
+import React, { useState } from "react";
 import Sidebar from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import {
-  inventarios_fields,
-  inventarios_header,
-} from "../data/arrays";
-import { Error } from "../components/error";
-import { Button } from "@/components/button";
-import { MaterialModal } from "@/components/modales/materialModal";
+import { inventarios_header } from "../data/arrays";
 import { Title } from "@/components/title";
-import Table from "@/components/table";
 import useSWR from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
+import Dropdown from "@/components/dropdown"; // Asegúrate de que la ruta sea correcta
 
 const InventoryContent = ({ inventory }) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownButtonRef = useRef();
 
   const { data: materials, error: materialsError } = useSWR(API_ROUTES.materials, fetcher);
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
   }
-
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (
-        dropdownButtonRef.current &&
-        !dropdownButtonRef.current.contains(event.target)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []); // Empty dependency array, runs once after initial render
 
   const handleDropdownToggle = () => {
     setDropdownOpen((prevOpen) => !prevOpen);
@@ -76,71 +53,43 @@ const InventoryContent = ({ inventory }) => {
         <h2 className="text-xl font-bold text-center mb-4">
           {selectedMaterial
             ? `Material seleccionado: ${materials.find((material) => material.id === selectedMaterial)?.name ||
-            `Material ${selectedMaterial}`
-            }`
+              `Material ${selectedMaterial}`}`
             : "Selecciona un Material"}
         </h2>
-        {/* Tabla de Productos */}
-        <div className="px-28 py-5 ">
-          <div className="flex justify-between pb-5">
-            <div className="relative">
-              <button
-                id="dropdownDefaultButton"
-                data-dropdown-toggle="dropdown"
-                onClick={handleDropdownToggle}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                type="button"
-                ref={dropdownButtonRef}
-              >
-                Seleccionar Material{" "}
-                {/* LOS ICONOS SVG SE PUEDEN CAMBIAR POR REACT-ICONS */}
-                <svg
-                  className={`w-2.5 h-2.5 ms-3 ${dropdownOpen ? "transform rotate-180" : ""
-                    }`}
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 10 6"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 1 4 4 4-4"
-                  />
-                </svg>
-              </button>
-              <div
-                id="dropdown"
-                className={`${dropdownOpen ? "block" : "hidden"
-                  } absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}
-              >
-                <ul
-                  className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                  aria-labelledby="dropdownDefaultButton"
-                >
-                  {uniqueMaterialIds.map((materialId) => {
-                    // Encuentra el material correspondiente usando el id
-                    const materialInfo = materials?.find((material) => material.id === materialId);
-
-                    return (
-                      <li key={materialId}>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          onClick={() => handleMaterialSelect(materialId)}
-                        >
-                          {materialInfo ? materialInfo.name : `Material ${materialId}`}
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </div>
-            <Button text="Agregar Movimiento" onClick={MaterialModal} />
-          </div>
+        <div className="relative">
+          <button
+            id="dropdownDefaultButton"
+            data-dropdown-toggle="dropdown"
+            onClick={handleDropdownToggle}
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            type="button"
+          >
+            Seleccionar Material{" "}
+            <svg
+              className={`w-2.5 h-2.5 ms-3 ${dropdownOpen ? "transform rotate-180" : ""}`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+          <Dropdown
+            materialIds={uniqueMaterialIds}
+            materials={materials}
+            onSelect={handleMaterialSelect}
+            isOpen={dropdownOpen}
+            toggleDropdown={setDropdownOpen}
+          />
+        </div>
+        <div className="px-28 py-5">
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -200,7 +149,6 @@ const Inventarios = () => {
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
   return <InventoryContent inventory={inventory} />;
-
 };
 
 export default Inventarios;
