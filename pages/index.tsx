@@ -1,18 +1,11 @@
+import { Loading } from "@/components/loading";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 
 function index() {
   const { user, error, isLoading } = useUser();
 
-  if (isLoading)
-    return (
-      <main
-        className="h-screen w-full flex flex-col items-center justify-center"
-        style={{ backgroundColor: "#181c24" }}
-      >
-        <h1 className="font-bold text-6xl text-white mb-20">Cargando...</h1>
-      </main>
-    );
+  if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
   if (user) {
