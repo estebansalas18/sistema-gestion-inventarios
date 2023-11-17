@@ -3,6 +3,8 @@ import Sidebar from "../components/sidebar";
 import { useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
+import useSWR from "swr";
+import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import Swal from "sweetalert2";
 
 const Materiales = () => {
@@ -10,9 +12,7 @@ const Materiales = () => {
 
   if (isLoading) return <div>Cargando...</div>;
   if (error) return <div>{error.message}</div>;
-
   const [materiales, setMateriales] = useState<Array<any>>([]);
-
   const handleAddMaterial = async (nombre: string, saldo: number) => {
     const nuevoMaterial = {
       id: materiales.length + 1,
@@ -62,6 +62,11 @@ const Materiales = () => {
   };
 
   if (user) {
+    const { data: materials, error: materialsError, isLoading: materialssLoading } = useSWR(API_ROUTES.materials, fetcher);
+    if (materialssLoading) return <div>Cargando...</div>;
+    if (materialsError) return <div>No se pudieron cargar los materiales</div>;
+    console.log(materials, materialsError, materialssLoading );
+  
     return (
       <div className="flex">
         <Sidebar />
@@ -102,7 +107,7 @@ const Materiales = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {materiales.map((material) => (
+                  {materials.map((material) => (
                     <tr
                       key={material.id}
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -110,10 +115,10 @@ const Materiales = () => {
                       <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         {material.id}
                       </td>
-                      <td className="px-6 py-4">{material.fechaCreacion}</td>
-                      <td className="px-6 py-4">{material.nombre}</td>
-                      <td className="px-6 py-4">{material.saldo}</td>
-                      <td className="px-6 py-4">{material.creador}</td>
+                      <td className="px-6 py-4">{material.createdAt}</td>
+                      <td className="px-6 py-4">{material.name}</td>
+                      <td className="px-6 py-4">{material.quantity}</td>
+                      <td className="px-6 py-4">{material.userId}</td>
                     </tr>
                   ))}
                 </tbody>
