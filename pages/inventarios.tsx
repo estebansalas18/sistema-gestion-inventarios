@@ -6,7 +6,8 @@ import { inventarios_header } from "../data/arrays";
 import { Title } from "@/components/title";
 import useSWR from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
-import Dropdown from "@/components/dropdown"; // Asegúrate de que la ruta sea correcta
+import Dropdown from "@/components/dropdown";
+import InventoryChart from "@/components/diagram"; // Asegúrate de que la ruta sea correcta
 
 const InventoryContent = ({ inventory }) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
@@ -129,10 +130,12 @@ const InventoryContent = ({ inventory }) => {
           <h2 className="text-base font-semibold text-left mb-4">
             Saldo actual
           </h2>
+          <InventoryChart selectedMaterial={selectedMaterial} inventory={inventory} />
         </div>
       </div>
     </div>
   );
+
 };
 
 const Inventarios = () => {
