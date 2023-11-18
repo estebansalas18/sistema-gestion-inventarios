@@ -9,7 +9,6 @@ import { Console } from "console";
 import { usuarios_fields, usuarios_header } from "@/data/arrays";
 import Table from "@/components/table";
 import { Title } from "@/components/title";
-import { Button } from "@/components/button";
 import { UsuarioModal } from "@/components/modales/usuarioModal";
 
 const Usuarios = () => {
@@ -32,14 +31,13 @@ const Usuarios = () => {
         <div className="flex-1 mt-20 pl-80">
           <Title title="Gestión de Usuarios" />
           <div className="px-28 py-5 ">
-            <div className="text-right">
-              <Button text="Agregar Material" onClick={UsuarioModal} />
-            </div>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
               <Table
                 headers={usuarios_header}
                 rows={users}
                 fieldsToShow={usuarios_fields}
+                actions={true}
+                onClick={UsuarioModal}
               />
             </div>
           </div>

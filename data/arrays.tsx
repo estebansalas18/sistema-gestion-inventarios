@@ -27,6 +27,7 @@ export const usuarios_header: string[] = [
   "Fecha de creación",
   "Correo",
   "Rol",
+  "Acciones",
 ];
 
 export const usuarios_fields = ["id", "emailVerified", "email", "roleId"];
