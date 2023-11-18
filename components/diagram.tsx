@@ -1,22 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
-interface InventoryChartProps {
-  selectedMaterial: number;
-  inventory: {
-    id: number;
-    date: string;
-    movementType: string;
-    quantity: number;
-    materialId: number;
-    userId: number;
-  }[];
+interface InventoryMovement {
+  id: number;
+  date: string;
+  movementType: string;
+  quantity: number;
+  materialId: number;
+  userId: number;
 }
 
-const InventoryChart = ({
+interface InventoryChartProps {
+  selectedMaterial: number | null;
+  inventory: InventoryMovement[];
+}
+
+interface ChartData {
+  labels: string[];
+  data: number[];
+}
+
+const InventoryChart: React.FC<InventoryChartProps> = ({
   selectedMaterial,
   inventory,
-}: InventoryChartProps) => {
-  const [chartData, setChartData] = useState(null);
+}) => {
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     updateChartData();
@@ -29,12 +37,13 @@ const InventoryChart = ({
       (movement) => movement.materialId === selectedMaterial
     );
 
-    const dates = filteredMovements.map((movement) => movement.date);
-    const saldo: number[] = [];
+    const dates = [""];
+    const saldo: number[] = [0];
 
     let currentBalance = 0;
 
     filteredMovements.forEach((movement) => {
+      dates.push(movement.date);
       if (movement.movementType === "ENTRADA") {
         currentBalance += movement.quantity;
       } else if (movement.movementType === "SALIDA") {
@@ -51,9 +60,9 @@ const InventoryChart = ({
   };
 
   const drawChart = () => {
-    if (!chartData) return;
+    if (!chartData || !canvasRef.current) return;
 
-    const canvas = document.getElementById("inventoryChart");
+    const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const { labels, data } = chartData;
 
@@ -61,8 +70,8 @@ const InventoryChart = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Dibujar ejes y etiquetas
-    const xAxisHeight = 20; // Altura del eje x
-    const yAxisWidth = 30; // Ancho del eje y
+    const xAxisHeight = 20;
+    const yAxisWidth = 30;
 
     // Eje x
     ctx.beginPath();
@@ -99,7 +108,7 @@ const InventoryChart = ({
 
     // Dibujar la línea del gráfico
     ctx.beginPath();
-    ctx.moveTo(yAxisWidth, canvas.height - xAxisHeight); // Mover al punto inicial
+    ctx.moveTo(yAxisWidth, canvas.height - xAxisHeight);
     const spacingX = (canvas.width - yAxisWidth) / (labels.length - 1);
 
     for (let i = 0; i < labels.length; i++) {
@@ -121,9 +130,10 @@ const InventoryChart = ({
 
   return (
     <canvas
+      ref={canvasRef}
       id="inventoryChart"
-      width="400"
-      height="200"
+      width={canvasRef.current?.parentElement?.offsetWidth || 400}
+      height={300}
       style={{ marginTop: "20px" }}
     ></canvas>
   );

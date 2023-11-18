@@ -10,6 +10,8 @@ import Dropdown from "@/components/dropdown";
 import InventoryChart from "@/components/diagram";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
+import { Button } from "@/components/button";
+import { InventarioModal } from "@/components/modales/inventarioModal";
 
 interface InventoryContentProps {
   inventory: {
@@ -80,7 +82,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
           }
         />
         <div className="px-28 py-5">
-          <div className="relative pb-5">
+          <div className="flex justify-between">
             <Dropdown
               materialIds={uniqueMaterialIds}
               materials={materials}
@@ -89,6 +91,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               handleDropdownToggle={handleDropdownToggle}
               toggleDropdown={setDropdownOpen}
             />
+            <Button text="Agregar Movimiento" onClick={InventarioModal} />
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
