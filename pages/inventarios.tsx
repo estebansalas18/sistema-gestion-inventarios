@@ -7,13 +7,29 @@ import { Title } from "@/components/title";
 import useSWR from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import Dropdown from "@/components/dropdown";
-import InventoryChart from "@/components/diagram"; // Asegúrate de que la ruta sea correcta
+import InventoryChart from "@/components/diagram";
+import { Loading } from "@/components/loading";
+import { Error } from "@/components/error";
 
-const InventoryContent = ({ inventory }) => {
+interface InventoryContentProps {
+  inventory: {
+    id: number;
+    date: string;
+    movementType: string;
+    quantity: number;
+    materialId: number;
+    userId: number;
+  }[];
+}
+
+const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { data: materials, error: materialsError } = useSWR(API_ROUTES.materials, fetcher);
+  const { data: materials, error: materialsError } = useSWR(
+    API_ROUTES.materials,
+    fetcher
+  );
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
@@ -33,64 +49,47 @@ const InventoryContent = ({ inventory }) => {
 
     const entrada = inventory
       .filter((movement) => movement.materialId === selectedMaterial)
-      .filter((movement) => movement.movementType === 'ENTRADA')
+      .filter((movement) => movement.movementType === "ENTRADA")
       .reduce((total, movement) => total + movement.quantity, 0);
 
     const salida = inventory
       .filter((movement) => movement.materialId === selectedMaterial)
-      .filter((movement) => movement.movementType === 'SALIDA')
+      .filter((movement) => movement.movementType === "SALIDA")
       .reduce((total, movement) => total + movement.quantity, 0);
 
     return entrada - salida;
   };
 
-  const uniqueMaterialIds = [...new Set(inventory.map((movement) => movement.materialId))];
+  const uniqueMaterialIds = [
+    ...new Set(inventory.map((movement) => movement.materialId)),
+  ];
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 mt-20 pl-80">
-        <Title title="Gestión de Inventarios" />
-        <h2 className="text-xl font-bold text-center mb-4">
-          {selectedMaterial
-            ? `Material seleccionado: ${materials.find((material) => material.id === selectedMaterial)?.name ||
-              `Material ${selectedMaterial}`}`
-            : "Selecciona un Material"}
-        </h2>
-        <div className="relative">
-          <button
-            id="dropdownDefaultButton"
-            data-dropdown-toggle="dropdown"
-            onClick={handleDropdownToggle}
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            type="button"
-          >
-            Seleccionar Material{" "}
-            <svg
-              className={`w-2.5 h-2.5 ms-3 ${dropdownOpen ? "transform rotate-180" : ""}`}
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
-          <Dropdown
-            materialIds={uniqueMaterialIds}
-            materials={materials}
-            onSelect={handleMaterialSelect}
-            isOpen={dropdownOpen}
-            toggleDropdown={setDropdownOpen}
-          />
-        </div>
+        <Title
+          title="Gestión de Inventarios"
+          subtitle={
+            selectedMaterial
+              ? `Material seleccionado: ${
+                  materials.find((material) => material.id === selectedMaterial)
+                    ?.name || `Material ${selectedMaterial}`
+                }`
+              : "Selecciona un Material"
+          }
+        />
         <div className="px-28 py-5">
+          <div className="relative pb-5">
+            <Dropdown
+              materialIds={uniqueMaterialIds}
+              materials={materials}
+              onSelect={handleMaterialSelect}
+              isOpen={dropdownOpen}
+              handleDropdownToggle={handleDropdownToggle}
+              toggleDropdown={setDropdownOpen}
+            />
+          </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -105,37 +104,47 @@ const InventoryContent = ({ inventory }) => {
               <tbody>
                 {selectedMaterial
                   ? inventory
-                    .filter((movement) => movement.materialId === selectedMaterial)
-                    .map((movement) => (
-                      <tr
-                        key={movement.id}
-                        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                      >
-                        <td className="px-6 py-4">{movement.id}</td>
-                        <td className="px-6 py-4">{movement.date}</td>
-                        <td className="px-6 py-4">
-                          {movement.movementType === 'ENTRADA' ? movement.quantity : ''}
-                        </td>
-                        <td className="px-6 py-4">
-                          {movement.movementType === 'SALIDA' ? movement.quantity : ''}
-                        </td>
-                        <td className="px-6 py-4">{movement.userId}</td>
-                      </tr>
-                    ))
+                      .filter(
+                        (movement) => movement.materialId === selectedMaterial
+                      )
+                      .map((movement) => (
+                        <tr
+                          key={movement.id}
+                          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        >
+                          <td className="px-6 py-4">{movement.id}</td>
+                          <td className="px-6 py-4">{movement.date}</td>
+                          <td className="px-6 py-4">
+                            {movement.movementType === "ENTRADA"
+                              ? movement.quantity
+                              : ""}
+                          </td>
+                          <td className="px-6 py-4">
+                            {movement.movementType === "SALIDA"
+                              ? movement.quantity
+                              : ""}
+                          </td>
+                          <td className="px-6 py-4">{movement.userId}</td>
+                        </tr>
+                      ))
                   : null}
               </tbody>
             </table>
           </div>
-          <Title title={`Cantidad del material seleccionado: ${calculateTotalQuantity()}`} />
-          <h2 className="text-base font-semibold text-left mb-4">
-            Saldo actual
-          </h2>
-          <InventoryChart selectedMaterial={selectedMaterial} inventory={inventory} />
+          <div className="justify-end mt-10">
+            <Title
+              title={`Cantidad del material seleccionado: ${calculateTotalQuantity()}`}
+              subtitle="Saldo total"
+            />
+            <InventoryChart
+              selectedMaterial={selectedMaterial}
+              inventory={inventory}
+            />
+          </div>
         </div>
       </div>
     </div>
   );
-
 };
 
 const Inventarios = () => {
@@ -146,12 +155,13 @@ const Inventarios = () => {
     isLoading: inventoryIsLoading,
   } = useSWR(API_ROUTES.inventoryMovements, fetcher);
 
-  if (isLoading) return <div>Cargando...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
-  return <InventoryContent inventory={inventory} />;
+  if (user) return <InventoryContent inventory={inventory} />;
+  return <Error />;
 };
 
 export default Inventarios;

@@ -1,7 +1,21 @@
-// InventoryChart.js
 import React, { useEffect, useState } from "react";
 
-const InventoryChart = ({ selectedMaterial, inventory }) => {
+interface InventoryChartProps {
+  selectedMaterial: number;
+  inventory: {
+    id: number;
+    date: string;
+    movementType: string;
+    quantity: number;
+    materialId: number;
+    userId: number;
+  }[];
+}
+
+const InventoryChart = ({
+  selectedMaterial,
+  inventory,
+}: InventoryChartProps) => {
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
@@ -11,17 +25,19 @@ const InventoryChart = ({ selectedMaterial, inventory }) => {
   const updateChartData = () => {
     if (!selectedMaterial || !inventory) return;
 
-    const filteredMovements = inventory.filter((movement) => movement.materialId === selectedMaterial);
+    const filteredMovements = inventory.filter(
+      (movement) => movement.materialId === selectedMaterial
+    );
 
     const dates = filteredMovements.map((movement) => movement.date);
-    const saldo = [];
+    const saldo: number[] = [];
 
     let currentBalance = 0;
 
     filteredMovements.forEach((movement) => {
-      if (movement.movementType === 'ENTRADA') {
+      if (movement.movementType === "ENTRADA") {
         currentBalance += movement.quantity;
-      } else if (movement.movementType === 'SALIDA') {
+      } else if (movement.movementType === "SALIDA") {
         currentBalance -= movement.quantity;
       }
 
@@ -57,7 +73,8 @@ const InventoryChart = ({ selectedMaterial, inventory }) => {
 
     // Etiquetas del eje x
     for (let i = 0; i < labels.length; i++) {
-      const x = yAxisWidth + (i * (canvas.width - yAxisWidth) / (labels.length - 1));
+      const x =
+        yAxisWidth + (i * (canvas.width - yAxisWidth)) / (labels.length - 1);
       ctx.fillText(labels[i], x, canvas.height - xAxisHeight + 15);
     }
 
@@ -73,7 +90,11 @@ const InventoryChart = ({ selectedMaterial, inventory }) => {
     for (let i = 0; i <= 5; i++) {
       const y = (i / 5) * (canvas.height - xAxisHeight);
       const balance = Math.round((i / 5) * maxBalance);
-      ctx.fillText(balance.toString(), yAxisWidth - 25, canvas.height - xAxisHeight - y);
+      ctx.fillText(
+        balance.toString(),
+        yAxisWidth - 25,
+        canvas.height - xAxisHeight - y
+      );
     }
 
     // Dibujar la línea del gráfico
@@ -82,8 +103,11 @@ const InventoryChart = ({ selectedMaterial, inventory }) => {
     const spacingX = (canvas.width - yAxisWidth) / (labels.length - 1);
 
     for (let i = 0; i < labels.length; i++) {
-      const x = yAxisWidth + (i * spacingX);
-      const y = canvas.height - xAxisHeight - (data[i] / maxBalance * (canvas.height - xAxisHeight));
+      const x = yAxisWidth + i * spacingX;
+      const y =
+        canvas.height -
+        xAxisHeight -
+        (data[i] / maxBalance) * (canvas.height - xAxisHeight);
       ctx.lineTo(x, y);
     }
 
@@ -96,7 +120,12 @@ const InventoryChart = ({ selectedMaterial, inventory }) => {
   }, [chartData]);
 
   return (
-    <canvas id="inventoryChart" width="400" height="200" style={{ marginTop: "20px" }}></canvas>
+    <canvas
+      id="inventoryChart"
+      width="400"
+      height="200"
+      style={{ marginTop: "20px" }}
+    ></canvas>
   );
 };
 

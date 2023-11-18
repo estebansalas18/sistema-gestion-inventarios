@@ -6,14 +6,6 @@ export const inventarios_header: string[] = [
   "Responsable",
 ];
 
-export const inventarios_fields = [
-  "id",
-  "date",
-  "entrance",
-  "exit",
-  "userId",
-];
-
 export const materiales_header: string[] = [
   "Identificador",
   "Fecha de creación",
