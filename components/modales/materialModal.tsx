@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import { supabase } from "@/service/apiConfig";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 
-const MaterialModal = async (revalidateCallback) => {
+const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; }) => {
   const { value: formValues, dismiss } = await Swal.fire({
     title: "Agregar Material",
     html: `
@@ -12,8 +12,16 @@ const MaterialModal = async (revalidateCallback) => {
     confirmButtonText: "Agregar",
     focusConfirm: false,
     preConfirm: async () => {
-      const nombre = Swal.getPopup().querySelector("#nombre").value;
-      const saldo = Swal.getPopup().querySelector("#saldo").value;
+      const nombreInput = Swal.getPopup()?.querySelector("#nombre") as HTMLInputElement;
+      const saldoInput = Swal.getPopup()?.querySelector("#saldo") as HTMLInputElement;
+
+      if (!nombreInput || !saldoInput) {
+        Swal.showValidationMessage("Completa todos los campos");
+        return false;
+      }
+
+      const nombre = nombreInput.value;
+      const saldo = saldoInput.value;
 
       if (!nombre || !saldo) {
         Swal.showValidationMessage("Completa todos los campos");
@@ -58,6 +66,27 @@ const MaterialModal = async (revalidateCallback) => {
 
         if (error) {
           throw error;
+        }
+
+        // Obtener el id del material recién creado
+        const materialId = data[0].id;
+
+        // Registrar un nuevo movimiento de tipo entrada en la tabla InventoryMovement
+        const { error: movementError } = await supabase
+          .from("InventoryMovement")
+          .insert([
+            {
+              movementType: "ENTRADA", // Ajusta el tipo de movimiento según tus necesidades
+              quantity: saldoInt,
+              materialId: materialId,
+              userId: "test2",
+              date: currentDate.toISOString(),
+            },
+          ])
+          .select();
+          
+          if (movementError) {
+          throw movementError;
         }
 
         // Invocar la función de devolución de llamada para revalidar los datos
