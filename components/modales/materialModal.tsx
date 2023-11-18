@@ -9,6 +9,7 @@ const MaterialModal = async (revalidateCallback) => {
       <input id="nombre" class="swal2-input" placeholder="Nombre del producto" />
       <input id="saldo" class="swal2-input" placeholder="Saldo del producto" />
     `,
+    showCancelButton: true,
     confirmButtonText: "Agregar",
     focusConfirm: false,
     preConfirm: async () => {
