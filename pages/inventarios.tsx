@@ -91,7 +91,17 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               handleDropdownToggle={handleDropdownToggle}
               toggleDropdown={setDropdownOpen}
             />
-            <Button text="Agregar Movimiento" onClick={InventarioModal} />
+            <Button
+              text="Agregar Movimiento"
+              onClick={() =>
+                InventarioModal({
+                  name:
+                    materials.find(
+                      (material) => material.id === selectedMaterial
+                    )?.name || `Material ${selectedMaterial}`,
+                })
+              }
+            />
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
