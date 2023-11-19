@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { inventarios_header } from "../data/arrays";
@@ -26,6 +26,7 @@ interface InventoryContentProps {
 }
 
 const InventoryContent = ({ inventory }: InventoryContentProps) => {
+  const [materialQuantity, setMaterialQuantity] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -33,6 +34,21 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     API_ROUTES.materials,
     MaterialService.getAllMaterials
   );
+
+  const fetchMaterialQuantity = async () => {
+    if (selectedMaterial) {
+      try {
+        const quantity = await MaterialService.getMaterialQuantity(selectedMaterial);
+        setMaterialQuantity(quantity);
+      } catch (error) {
+        console.error("Error al obtener la cantidad del material:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchMaterialQuantity();
+  }, [selectedMaterial, inventory]);
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
@@ -47,30 +63,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     setDropdownOpen(false);
   };
 
-  const calculateTotalQuantity = () => {
-    if (!selectedMaterial) return 0;
-
-    const entrada = inventory
-      .filter((movement) => movement.materialId === selectedMaterial)
-      .filter((movement) => movement.movementType === "ENTRADA")
-      .reduce((total, movement) => total + movement.quantity, 0);
-
-    const salida = inventory
-      .filter((movement) => movement.materialId === selectedMaterial)
-      .filter((movement) => movement.movementType === "SALIDA")
-      .reduce((total, movement) => total + movement.quantity, 0);
-
-    return entrada - salida;
-  };
-
   const uniqueMaterialIds = [
     ...new Set(inventory.map((movement) => movement.materialId)),
   ];
-
-  const revalidateMovements = async () => {
-    // Actualiza los datos llamando a la función `mutate` de useSWR
-    mutate(API_ROUTES.inventoryMovements, InventoryMovementService.getAllInventoryMovements);
-  };
 
   return (
     <div className="flex">
@@ -155,10 +150,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
             </table>
           </div>
           <div className="justify-end mt-10">
-            <Title
-              title={`Cantidad del material seleccionado: ${calculateTotalQuantity()}`}
-              subtitle="Saldo total"
-            />
+          <Title
+            title={`Cantidad del material seleccionado: ${materialQuantity}`}
+            subtitle="Saldo total"
+          />
             <InventoryChart
               selectedMaterial={selectedMaterial}
               inventory={inventory}

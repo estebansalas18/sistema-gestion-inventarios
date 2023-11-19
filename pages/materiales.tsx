@@ -21,7 +21,6 @@ const Materiales = () => {
   };
   
   if (user) {
-    // END: ed8c6549bwf9
     const {
       data: materials,
       error: materialsError,
@@ -29,8 +28,7 @@ const Materiales = () => {
     } = useSWR(API_ROUTES.materials, fetcher);
     if (materialssLoading) return <div>Cargando...</div>;
     if (materialsError) return <div>No se pudieron cargar los materiales</div>;
-    console.log(materials, materialsError, materialssLoading);
-
+    
     return (
       <div className="flex">
         <Sidebar />

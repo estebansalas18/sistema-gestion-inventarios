@@ -103,6 +103,24 @@ const MaterialService = {
       throw error;
     }
   },
-};
 
+getMaterialQuantity: async (materialId) => {
+  try {
+    const response = await supabase
+      .from("Material")
+      .select("quantity")
+      .eq("id", materialId)
+      .single();
+
+    if (response.error) {
+      throw response.error;
+    }
+
+    return response.data.quantity || 0;
+  } catch (error) {
+    console.error("Error al obtener la cantidad del material en Supabase:", error);
+    throw error;
+  }
+},
+};
 export default MaterialService;
