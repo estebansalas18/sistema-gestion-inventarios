@@ -37,7 +37,7 @@ const Usuarios = () => {
               rows={users}
               fieldsToShow={usuarios_fields}
               actions={true}
-              onClick={(row) => UsuarioModal({ name: row.name })}
+              onClick={(row) => UsuarioModal({ name: row.name, email:row.email })}
             />
             </div>
           </div>

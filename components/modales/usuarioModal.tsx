@@ -2,13 +2,14 @@ import Swal from "sweetalert2";
 
 interface UsuarioModalProps {
   name: string;
+  email: string;
 }
 
-export const UsuarioModal = async ({ name }: UsuarioModalProps) => {
+export const UsuarioModal = async ({ name, email }: UsuarioModalProps) => {
   Swal.fire({
     title: "Cambiar rol de " + name,
     html: `
-      <input id="email" class="swal2-input" placeholder="Cambiar email" />
+      <input id="email" class="swal2-input" placeholder="Cambiar email" value="${email}" readonly/>
     `,
     input: "select",
     inputOptions: {
