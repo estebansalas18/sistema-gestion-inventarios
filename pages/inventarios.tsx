@@ -1,17 +1,18 @@
-// Inventarios.tsx
 import React, { useState } from "react";
 import Sidebar from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { inventarios_header } from "../data/arrays";
 import { Title } from "@/components/title";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import Dropdown from "@/components/dropdown";
 import InventoryChart from "@/components/diagram";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Button } from "@/components/button";
-import { InventarioModal } from "@/components/modales/inventarioModal";
+import InventarioModal from "@/components/modales/inventarioModal";
+import MaterialService from "@/service/materialservice";
+import InventoryMovementService from "@/service/inventoryMovementService";
 
 interface InventoryContentProps {
   inventory: {
@@ -30,7 +31,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 
   const { data: materials, error: materialsError } = useSWR(
     API_ROUTES.materials,
-    fetcher
+    MaterialService.getAllMaterials
   );
 
   if (materialsError) {
@@ -66,6 +67,11 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     ...new Set(inventory.map((movement) => movement.materialId)),
   ];
 
+  const revalidateMovements = async () => {
+    // Actualiza los datos llamando a la función `mutate` de useSWR
+    mutate(API_ROUTES.inventoryMovements, InventoryMovementService.getAllInventoryMovements);
+  };
+
   return (
     <div className="flex">
       <Sidebar />
@@ -93,15 +99,19 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
             />
             <Button
               text="Agregar Movimiento"
-              onClick={() =>
+              onClick={() => {
                 InventarioModal({
                   name:
                     materials.find(
                       (material) => material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
-                })
-              }
+                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovements),
+                });
+              }}
+              disabled={!selectedMaterial}
+              title="Selecciona un material antes de agregar un movimiento."
             />
+
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -166,7 +176,7 @@ const Inventarios = () => {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
-  } = useSWR(API_ROUTES.inventoryMovements, fetcher);
+  } = useSWR(API_ROUTES.inventoryMovements, InventoryMovementService.getAllInventoryMovements);
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;

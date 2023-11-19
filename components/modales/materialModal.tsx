@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
-import { supabase } from "@/service/apiConfig";
-import { API_ROUTES, fetcher } from "@/service/apiConfig";
+import MaterialService from "@/service/materialservice";
+import InventoryMovementService from "@/service/inventoryMovementService";
 
 const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; }) => {
   const { value: formValues, dismiss } = await Swal.fire({
@@ -37,58 +37,23 @@ const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; 
 
       try {
         // Verificar si el nombre del material ya existe en la tabla
-        const existingMaterial = await supabase
-          .from("Material")
-          .select("name")
-          .eq("name", nombre)
-          .single();
+        const materialExists = await MaterialService.checkMaterialExists(nombre);
 
-        if (existingMaterial.data) {
+        if (materialExists) {
           Swal.showValidationMessage("Ya existe un material con ese nombre");
           return false;
         }
 
-        // Obtener la fecha actual
-        const currentDate = new Date();
+        // Crear el material
+        const newMaterial = await MaterialService.createMaterial(nombre, saldoInt, "test2");
 
-        // Realizar la inserción en Supabase utilizando la ruta definida en API_ROUTES
-        const { data, error } = await supabase
-          .from("Material")
-          .insert([
-            {
-              name: nombre,
-              quantity: saldoInt,
-              userId: "test2",
-              createdAt: currentDate.toISOString(),
-              updatedAt: currentDate.toISOString(),
-            },
-          ])
-          .select();
-
-        if (error) {
-          throw error;
-        }
-
-        // Obtener el id del material recién creado
-        const materialId = data[0].id;
-
-        // Registrar un nuevo movimiento de tipo entrada en la tabla InventoryMovement
-        const { error: movementError } = await supabase
-          .from("InventoryMovement")
-          .insert([
-            {
-              movementType: "ENTRADA", // Ajusta el tipo de movimiento según tus necesidades
-              quantity: saldoInt,
-              materialId: materialId,
-              userId: "test2",
-              date: currentDate.toISOString(),
-            },
-          ])
-          .select();
-          
-          if (movementError) {
-          throw movementError;
-        }
+        // Crear el movimiento de inventario
+        await InventoryMovementService.createInventoryMovement(
+          "ENTRADA", // Ajusta el tipo de movimiento según tus necesidades
+          saldoInt,
+          newMaterial.id,
+          "test2"
+        );
 
         // Invocar la función de devolución de llamada para revalidar los datos
         revalidateCallback();

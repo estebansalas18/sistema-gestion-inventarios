@@ -6,7 +6,7 @@ interface UsuarioModalProps {
 
 export const UsuarioModal = async ({ name }: UsuarioModalProps) => {
   Swal.fire({
-    title: "Editar Información de" + name,
+    title: "Cambiar rol de " + name,
     html: `
       <input id="email" class="swal2-input" placeholder="Cambiar email" />
     `,

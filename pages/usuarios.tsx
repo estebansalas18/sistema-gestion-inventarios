@@ -32,13 +32,13 @@ const Usuarios = () => {
           <Title title="Gestión de Usuarios" />
           <div className="px-28 py-5 ">
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-              <Table
-                headers={usuarios_header}
-                rows={users}
-                fieldsToShow={usuarios_fields}
-                actions={true}
-                onClick={UsuarioModal}
-              />
+            <Table
+              headers={usuarios_header}
+              rows={users}
+              fieldsToShow={usuarios_fields}
+              actions={true}
+              onClick={(row) => UsuarioModal({ name: row.name })}
+            />
             </div>
           </div>
         </div>

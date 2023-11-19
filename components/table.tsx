@@ -46,7 +46,7 @@ const Table = ({
             ))}
             {actions && (
               <td className="py-2 pl-4">
-                <Button text="Editar" onClick={onClick} />
+                <Button text="Editar" onClick={() => onClick(row)} />
               </td>
             )}
           </tr>
