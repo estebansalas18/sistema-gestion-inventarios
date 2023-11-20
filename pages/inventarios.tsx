@@ -1,52 +1,67 @@
-// Inventarios.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sidebar } from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useSession } from "next-auth/react";
 import { inventarios_header } from "../data/arrays";
 import { Title } from "@/components/title";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
-import  { Dropdown } from "@/components/dropdown";
+import { Dropdown } from "@/components/dropdown";
 import InventoryChart from "@/components/diagram";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Button } from "@/components/button";
-import { InventarioModal } from "@/components/modales/inventarioModal";
-import { Material } from "@prisma/client";
-import { MaterialsQuery } from "@/types";
-import { MaterialService } from "@/service/materialservice";
+import InventarioModal from "@/components/modales/inventarioModal";
+import MaterialService from "@/service/materialservice";
+import InventoryMovementService from "@/service/inventoryMovementService";
+import { InventoryMovement } from "@prisma/client";
+
 
 interface InventoryContentProps {
   inventory: {
-    id: number;
-    date: string;
+  id: string;
     movementType: string;
     quantity: number;
-    materialId: number;
-    userId: number;
-  }[];
-
-  materials: {
-    id: number;
-    name: string;
-    quantity: number;
-    unit: string;
-    createdAt: string;
-    updatedAt: string;
-    userId: number;
-  }[];
+    materialId: string;
+    userId: string;
+    date: Date;
+  }[];  
 }
 
-interface MaterialProps {
-  
-}
-
-const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
+const InventoryContent = ({ inventory }: InventoryContentProps) => {
+  const [materialQuantity, setMaterialQuantity] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  
+  const { data: materials, error: materialsError, isLoading } = useSWR(
+    API_ROUTES.materials, fetcher
+  );
+
+  if (isLoading) return <div> cargando... </div>;
+  if (materialsError) return <div> No se pudieron cargar los materiales </div>;
+
+  console.log(materials.materials)
+
+
+
+  const fetchMaterialQuantity = async () => {
+    if (selectedMaterial) {
+      try {
+        const quantity = await MaterialService.getMaterialQuantity(selectedMaterial);
+        setMaterialQuantity(quantity);
+      } catch (error) {
+        console.error("Error al obtener la cantidad del material:", error);
+      }
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchMaterialQuantity();
+  // }, [selectedMaterial, inventory]);
+
+  if (materialsError) {
+    return <div>Error al cargar los materiales</div>;
+  }
 
   const handleDropdownToggle = () => {
     setDropdownOpen((prevOpen) => !prevOpen);
@@ -57,42 +72,9 @@ const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
     setDropdownOpen(false);
   };
 
-  const calculateTotalQuantity = () => {
-    if (!selectedMaterial) return 0;
-
-    const entrada = inventory
-      .filter((movement) => movement.materialId === selectedMaterial)
-      .filter((movement) => movement.movementType === "ENTRADA")
-      .reduce((total, movement) => total + movement.quantity, 0);
-
-    const salida = inventory
-      .filter((movement) => movement.materialId === selectedMaterial)
-      .filter((movement) => movement.movementType === "SALIDA")
-      .reduce((total, movement) => total + movement.quantity, 0);
-
-    return entrada - salida;
-  };
-
-  // const uniqueMaterialIds = [];
-
-  // for (let i = 0; i < materials.length; i++) {
-  //   if (!umiqueMaterials.includes(materials[i].id)) {
-  //     umiqueMaterials.push(materials[i].id);
-  //   }
-  // }
-
-  const uniqueMaterialIds = MaterialService.getUniqueMaterialIds(inventory);
-
-  // const { data: uniqueMaterialIds, error: materialIdsError } = useSWR(
-  //   API_ROUTES.materials, // Define esta ruta en tu archivo de configuración de API
-  //   MaterialService.getAllMaterialIds
-  // );
-
-  //const uniqueMaterialIds = materials.map((material) => material.id);
-
-  /*const uniqueMaterialIds = [
+  const uniqueMaterialIds = [
     ...new Set(inventory.map((movement) => movement.materialId)),
-  ];*/
+  ];
 
   return (
     <div className="flex">
@@ -103,7 +85,7 @@ const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
           subtitle={
             selectedMaterial
               ? `Material seleccionado: ${
-                  materials.find((material) => material.id === selectedMaterial)
+                  materials.materials.find((material) => material.id === selectedMaterial)
                     ?.name || `Material ${selectedMaterial}`
                 }`
               : "Selecciona un Material"
@@ -113,7 +95,7 @@ const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
           <div className="flex justify-between">
             <Dropdown
               materialIds={uniqueMaterialIds}
-              materials={materials}
+              materials={materials.materials}
               onSelect={handleMaterialSelect}
               isOpen={dropdownOpen}
               handleDropdownToggle={handleDropdownToggle}
@@ -121,15 +103,19 @@ const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
             />
             <Button
               text="Agregar Movimiento"
-              onClick={() =>
+              onClick={() => {
                 InventarioModal({
                   name:
                     materials.find(
                       (material) => material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
-                })
-              }
+                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovements),
+                });
+              }}
+              disabled={!selectedMaterial}
+              title="Selecciona un material antes de agregar un movimiento."
             />
+
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -173,10 +159,10 @@ const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
             </table>
           </div>
           <div className="justify-end mt-10">
-            <Title
-              title={`Cantidad del material seleccionado: ${calculateTotalQuantity()}`}
-              subtitle="Saldo total"
-            />
+          <Title
+            title={`Cantidad del material seleccionado: ${materialQuantity}`}
+            subtitle="Saldo total"
+          />
             <InventoryChart
               selectedMaterial={selectedMaterial}
               inventory={inventory}
@@ -190,30 +176,22 @@ const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
 
 const Inventarios = () => {
   const { data, status } = useSession();
-  const user = data?.user;
   const {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
   } = useSWR(API_ROUTES.inventory, fetcher);
 
-
-  const { data: materials, error: materialsError } = useSWR(
-    API_ROUTES.materials,
-    fetcher
-  );
-
-  if (materialsError) {
-    return <div>Error al cargar los materiales</div>;
-  }
-
+  const user = data?.user;
 
   if (status === 'loading') return <Loading />;
   //if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
-  if (user) return <InventoryContent inventory={inventory} materials={materials}/>;
+  const inventarioArray: InventoryMovement[] = Object.values(inventory.inventoryMovements);
+  console.log(typeof   inventarioArray);
+  if (user) return <InventoryContent inventory={inventarioArray} />;
   return <Error />;
 };
 

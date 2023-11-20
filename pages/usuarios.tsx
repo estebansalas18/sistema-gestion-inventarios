@@ -1,11 +1,11 @@
 import React from "react";
-import Sidebar from "../components/sidebar";
+import { Sidebar } from "../components/sidebar";
 import { useSession } from "next-auth/react";
 import { Error } from "../components/error";
 import useSWR from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { usuarios_fields, usuarios_header } from "@/data/arrays";
-import Table from "@/components/table";
+import { Table } from "@/components/table";
 import { Title } from "@/components/title";
 import { UsuarioModal } from "@/components/modales/usuarioModal";
 
@@ -13,15 +13,18 @@ const Usuarios = () => {
   const { data, status } = useSession();
   //const { users, usersError, usersLoading } = useGetUsers();
   const {
-    data: users,
+    data: usersData,
     error: usersError,
     isLoading: usersLoading,
   } = useSWR(API_ROUTES.users, fetcher);
+ 
 
   if (status === 'loading' || usersLoading) return <div>Cargando...</div>;
   //if (userError) return <div>{userError?.message}</div>;
   if (usersError) return <div>{usersError?.message}</div>;
-  if (data) {
+  if (status === 'authenticated') {
+    const users = usersData.users;
+    console.log(usersData);
     return (
       <div className="flex">
         <Sidebar />

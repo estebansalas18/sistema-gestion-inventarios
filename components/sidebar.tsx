@@ -10,8 +10,10 @@ import useSWR from "swr";
 const Sidebar = () => {
   const router = useRouter();
   const currentPath = router.pathname;
-  const { data } = useSession();
+  const { data , status} = useSession();
   const user = data?.user;
+
+  if(status === "loading") return <div>Cargando...</div>;
 
   const {
     data: userDB,
@@ -23,7 +25,8 @@ const Sidebar = () => {
   if (usersError) return <div>{usersError?.message}</div>;
 
   //const userRole = "ADMIN";
-  const userRole = userDB?.role;
+  const userRole = userDB?.user?.roleId;
+  console.log(userRole);
 
   const UserRoleBadge = ({ role }: { role: string }) => {
     if (role === "ADMIN") {
@@ -61,7 +64,7 @@ const Sidebar = () => {
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {user?.name}
             </p>
-            <span>
+            <span>              
               <UserRoleBadge role={userRole} />
             </span>
           </div>

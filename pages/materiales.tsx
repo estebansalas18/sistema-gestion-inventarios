@@ -1,11 +1,11 @@
-import Sidebar from "../components/sidebar";
+import { Sidebar }from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useSession } from "next-auth/react";
 import { Error } from "../components/error";
 import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { materiales_fields, materiales_header } from "@/data/arrays";
-import Table from "@/components/table";
+import { Table } from "@/components/table";
 import MaterialModal from "@/components/modales/materialModal"; // Fix import statement
 import { Loading } from "@/components/loading";
 import { Button } from "@/components/button";
@@ -47,7 +47,7 @@ const Materiales = () => {
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
               <Table
                 headers={materiales_header}
-                rows={materials}
+                rows={materials.materials}
                 fieldsToShow={materiales_fields}
               />
             </div>
