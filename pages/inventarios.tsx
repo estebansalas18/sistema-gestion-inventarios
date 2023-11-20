@@ -40,10 +40,6 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   if (isLoading) return <div> cargando... </div>;
   if (materialsError) return <div> No se pudieron cargar los materiales </div>;
 
-  console.log(materials.materials)
-
-
-
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
@@ -76,6 +72,11 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     ...new Set(inventory.map((movement) => movement.materialId)),
   ];
 
+  const revalidateMovements = async () => {
+    // Actualiza los datos llamando a la función `mutate` de useSWR
+    mutate(API_ROUTES.inventoryMovementsSupabase, InventoryMovementService.getAllInventoryMovements);
+  };
+
   return (
     <div className="flex">
       <Sidebar />
@@ -106,10 +107,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               onClick={() => {
                 InventarioModal({
                   name:
-                    materials.find(
+                    materials.materials.find(
                       (material) => material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
-                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovements),
+                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
                 });
               }}
               disabled={!selectedMaterial}
@@ -190,7 +191,6 @@ const Inventarios = () => {
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
   const inventarioArray: InventoryMovement[] = Object.values(inventory.inventoryMovements);
-  console.log(typeof   inventarioArray);
   if (user) return <InventoryContent inventory={inventarioArray} />;
   return <Error />;
 };

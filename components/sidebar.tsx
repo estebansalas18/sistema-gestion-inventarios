@@ -24,9 +24,7 @@ const Sidebar = () => {
   if (usersLoading) return <div>Cargando...</div>;
   if (usersError) return <div>{usersError?.message}</div>;
 
-  //const userRole = "ADMIN";
   const userRole = userDB?.user?.roleId;
-  console.log(userRole);
 
   const UserRoleBadge = ({ role }: { role: string }) => {
     if (role === "ADMIN") {

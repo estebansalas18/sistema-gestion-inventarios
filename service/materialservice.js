@@ -1,9 +1,13 @@
 import { supabase } from "@/service/apiConfig";
+import { v4 as uuidv4 } from 'uuid';
+
 
 const MaterialService = {
   getAllMaterials: async () => {
     try {
-      const { data, error } = await supabase.from("Material").select();
+      const { data, error } = await supabase
+        .from("Material")
+        .select();
 
       if (error) {
         throw error;
@@ -15,14 +19,16 @@ const MaterialService = {
       throw error;
     }
   },
-
+  
   createMaterial: async (nombre, saldoInt, userId) => {
     try {
       const currentDate = new Date();
+      const materialId = uuidv4();
       const { data, error } = await supabase
         .from("Material")
         .insert([
           {
+            id: materialId,
             name: nombre,
             quantity: saldoInt,
             userId: userId,
@@ -53,10 +59,7 @@ const MaterialService = {
 
       return !!data; // Devuelve true si el material existe, false si no existe
     } catch (error) {
-      console.error(
-        "Error al verificar la existencia del material en Supabase:",
-        error
-      );
+      console.error("Error al verificar la existencia del material en Supabase:", error);
       throw error;
     }
   },
@@ -105,61 +108,23 @@ const MaterialService = {
     }
   },
 
-  getMaterialQuantity: async (materialId) => {
-    try {
-      const response = await supabase
-        .from("Material")
-        .select("quantity")
-        .eq("id", materialId)
-        .single();
+getMaterialQuantity: async (materialId) => {
+  try {
+    const response = await supabase
+      .from("Material")
+      .select("quantity")
+      .eq("id", materialId)
+      .single();
 
-      if (response.error) {
-        throw response.error;
-      }
-
-      return response.data.quantity || 0;
-    } catch (error) {
-      console.error(
-        "Error al obtener la cantidad del material en Supabase:",
-        error
-      );
-      throw error;
+    if (response.error) {
+      throw response.error;
     }
-  },
 
-  getAllMaterialIds: async () => {
-    try {
-      const { data, error } = await supabase
-        .from("Material")
-        .select("id");
-
-      if (error) {
-        throw error;
-      }
-
-      // Mapear los IDs y devolverlos como un array
-      const materialIds = data.map((material) => {material.id, material.name});
-      return materialIds;
-    } catch (error) {
-      console.error("Error al obtener los IDs de los materiales en Supabase:", error);
-      throw error;
-    }
-  },
-
-  getUniqueMaterialIds: async (inventory) => {
-    try {
-      // Obtener todos los IDs de materiales únicos del inventario
-      const uniqueMaterialIds = [...new Set(inventory.map((movement) => movement.materialId))];
-      
-      // También puedes querer obtener información adicional sobre los materiales aquí, si es necesario
-
-      return uniqueMaterialIds;
-    } catch (error) {
-      console.error("Error al obtener IDs únicos de materiales en Supabase:", error);
-      throw error;
-    }
-  },  
-
+    return response.data.quantity || 0;
+  } catch (error) {
+    console.error("Error al obtener la cantidad del material en Supabase:", error);
+    throw error;
+  }
+},
 };
-
-export { MaterialService };
+export default MaterialService;

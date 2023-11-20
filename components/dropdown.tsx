@@ -74,7 +74,6 @@ const Dropdown = ({
           className="py-2 text-sm text-gray-700 dark:text-gray-200"
           aria-labelledby="dropdownDefaultButton"
         >
-          {console.log(materialIds)}
           {materialIds.map((materialId) => {
             const materialInfo = materials?.find(
               (material) => material.id === materialId

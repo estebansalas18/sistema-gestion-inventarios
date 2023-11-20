@@ -24,7 +24,6 @@ const Usuarios = () => {
   if (usersError) return <div>{usersError?.message}</div>;
   if (status === 'authenticated') {
     const users = usersData.users;
-    console.log(usersData);
     return (
       <div className="flex">
         <Sidebar />
@@ -37,8 +36,8 @@ const Usuarios = () => {
                 rows={users}
                 fieldsToShow={usuarios_fields}
                 actions={true}
-                onClick={UsuarioModal}
-              />
+                onClick={(row) => UsuarioModal({ name: row.name, email:row.email })}
+                />
             </div>
           </div>
         </div>
