@@ -1,17 +1,21 @@
 // Inventarios.tsx
 import React, { useState } from "react";
-import Sidebar from "../components/sidebar";
+import { Sidebar } from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession } from "next-auth/react";
 import { inventarios_header } from "../data/arrays";
 import { Title } from "@/components/title";
 import useSWR from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
-import Dropdown from "@/components/dropdown";
+import  { Dropdown } from "@/components/dropdown";
 import InventoryChart from "@/components/diagram";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Button } from "@/components/button";
 import { InventarioModal } from "@/components/modales/inventarioModal";
+import { Material } from "@prisma/client";
+import { MaterialsQuery } from "@/types";
+import { MaterialService } from "@/service/materialservice";
 
 interface InventoryContentProps {
   inventory: {
@@ -22,20 +26,27 @@ interface InventoryContentProps {
     materialId: number;
     userId: number;
   }[];
+
+  materials: {
+    id: number;
+    name: string;
+    quantity: number;
+    unit: string;
+    createdAt: string;
+    updatedAt: string;
+    userId: number;
+  }[];
 }
 
-const InventoryContent = ({ inventory }: InventoryContentProps) => {
+interface MaterialProps {
+  
+}
+
+const InventoryContent = ({ inventory, materials }: InventoryContentProps) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { data: materials, error: materialsError } = useSWR(
-    API_ROUTES.materials,
-    fetcher
-  );
-
-  if (materialsError) {
-    return <div>Error al cargar los materiales</div>;
-  }
+  
 
   const handleDropdownToggle = () => {
     setDropdownOpen((prevOpen) => !prevOpen);
@@ -62,9 +73,26 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     return entrada - salida;
   };
 
-  const uniqueMaterialIds = [
+  // const uniqueMaterialIds = [];
+
+  // for (let i = 0; i < materials.length; i++) {
+  //   if (!umiqueMaterials.includes(materials[i].id)) {
+  //     umiqueMaterials.push(materials[i].id);
+  //   }
+  // }
+
+  const uniqueMaterialIds = MaterialService.getUniqueMaterialIds(inventory);
+
+  // const { data: uniqueMaterialIds, error: materialIdsError } = useSWR(
+  //   API_ROUTES.materials, // Define esta ruta en tu archivo de configuración de API
+  //   MaterialService.getAllMaterialIds
+  // );
+
+  //const uniqueMaterialIds = materials.map((material) => material.id);
+
+  /*const uniqueMaterialIds = [
     ...new Set(inventory.map((movement) => movement.materialId)),
-  ];
+  ];*/
 
   return (
     <div className="flex">
@@ -161,19 +189,31 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 };
 
 const Inventarios = () => {
-  const { user, error, isLoading } = useUser();
+  const { data, status } = useSession();
+  const user = data?.user;
   const {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
-  } = useSWR(API_ROUTES.inventoryMovements, fetcher);
+  } = useSWR(API_ROUTES.inventory, fetcher);
 
-  if (isLoading) return <Loading />;
-  if (error) return <div>{error.message}</div>;
+
+  const { data: materials, error: materialsError } = useSWR(
+    API_ROUTES.materials,
+    fetcher
+  );
+
+  if (materialsError) {
+    return <div>Error al cargar los materiales</div>;
+  }
+
+
+  if (status === 'loading') return <Loading />;
+  //if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
-  if (user) return <InventoryContent inventory={inventory} />;
+  if (user) return <InventoryContent inventory={inventory} materials={materials}/>;
   return <Error />;
 };
 

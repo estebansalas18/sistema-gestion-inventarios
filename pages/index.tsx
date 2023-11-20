@@ -1,14 +1,12 @@
 import { Loading } from "@/components/loading";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import Link from "next/link";
+import { useSession, signIn } from "next-auth/react";
 
-function index() {
-  const { user, error, isLoading } = useUser();
+const Index = () => {
+  const { data, status } = useSession();
 
-  if (isLoading) return <Loading />;
-  if (error) return <div>{error.message}</div>;
-
-  if (user) {
+  if (status === 'loading') return <Loading />;
+  //if (status === 'unauthenticated') return <div>{/*error.message*/}unauthenticated</div>;
+  if (data) {
     return window.location.replace("/inventarios");
   }
   return (
@@ -19,16 +17,15 @@ function index() {
       <h1 className="font-bold text-6xl text-white mb-20">
         Sistema de Gestión de Inventarios
       </h1>
-      <Link href="/api/auth/login">
-        <button
+      <button
+          onClick={() => {signIn('auth0')}}
           type="button"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-6 py-3 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
           Iniciar Sesión
         </button>
-      </Link>
     </main>
   );
 }
 
-export default index;
+export default Index;
