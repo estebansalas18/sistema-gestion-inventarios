@@ -36,8 +36,7 @@ export default async function handler(
           data: {
             roleId: body.roleId,
           }
-        });
-    
+        });    
         res.status(200).json({ newUser });
     } 
     else {
