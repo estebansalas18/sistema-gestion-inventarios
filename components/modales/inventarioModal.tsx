@@ -54,7 +54,7 @@ const InventarioModal = async ({ name, revalidateMovements }: InventarioModalPro
       try {
         // Obtener el ID del material por su nombre
         const materialId = await MaterialService.getMaterialIdByName(name);
-        
+
         // Crear el movimiento de inventario
         await InventoryMovementService.createInventoryMovement(
           movementType,

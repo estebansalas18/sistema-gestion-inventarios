@@ -8,7 +8,6 @@ interface ButtonProps {
 }
 
 export const Button = ({ onClick, text, disabled, title }: ButtonProps) => {
-  
   const handleClick = () => {
     if (disabled && title) {
       Swal.fire({

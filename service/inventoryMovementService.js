@@ -3,6 +3,7 @@ import { supabase } from "./apiConfig";
 import MaterialService from "@/service/materialservice";
 import { v4 as uuidv4 } from 'uuid';
 
+
 const InventoryMovementService = {
 
   getAllInventoryMovements: async () => {
@@ -22,7 +23,6 @@ const InventoryMovementService = {
     }
   },
   
-
   createInventoryMovement: async (movementType, quantity, materialId, userId) => {
     try {      
       // Crear el movimiento de inventario

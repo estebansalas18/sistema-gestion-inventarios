@@ -16,7 +16,6 @@ import MaterialService from "@/service/materialservice";
 import InventoryMovementService from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
 
-
 interface InventoryContentProps {
   inventory: {
   id: string;
@@ -39,7 +38,6 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 
   if (isLoading) return <div> cargando... </div>;
   if (materialsError) return <div> No se pudieron cargar los materiales </div>;
-
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
@@ -111,6 +109,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                       (material) => material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
                   revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
+
                 });
               }}
               disabled={!selectedMaterial}
