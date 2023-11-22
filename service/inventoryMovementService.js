@@ -1,6 +1,8 @@
 // inventoryMovementService.js
 import { supabase } from "./apiConfig";
 import MaterialService from "@/service/materialservice";
+import { v4 as uuidv4 } from 'uuid';
+
 
 const InventoryMovementService = {
 
@@ -22,12 +24,14 @@ const InventoryMovementService = {
   },
   
   createInventoryMovement: async (movementType, quantity, materialId, userId) => {
-    try {
+    try {      
       // Crear el movimiento de inventario
+      const movementId = uuidv4();
       const { data: newMovement, error: movementError } = await supabase
         .from("InventoryMovement")
         .insert([
           {
+            id: movementId,
             movementType,
             quantity,
             materialId,
@@ -38,7 +42,8 @@ const InventoryMovementService = {
         .select();
 
       if (movementError) {
-        throw movementError;
+        console.log("Se vino derecho")
+        throw "Se vino derecho";
       }
 
       // Obtener el saldo actual del material
@@ -56,6 +61,7 @@ const InventoryMovementService = {
       throw error;
     }
   },
+
 };
 
-export default InventoryMovementService;
+export { InventoryMovementService };

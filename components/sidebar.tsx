@@ -1,14 +1,30 @@
 import React from "react";
 import { FaBox, FaUser, FaLemon, FaSignOutAlt } from "react-icons/fa";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession, signOut  } from "next-auth/react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/image";
+import { API_ROUTES, fetcher } from "@/service/apiConfig";
+import useSWR from "swr";
 
 const Sidebar = () => {
   const router = useRouter();
   const currentPath = router.pathname;
-  const { user, error, isLoading } = useUser();
+  const { data , status} = useSession();
+  const user = data?.user;
 
-  const userRole = "ADMIN";
+  if(status === "loading") return <div>Cargando...</div>;
+
+  const {
+    data: userDB,
+    error: usersError,
+    isLoading: usersLoading,
+  } = useSWR(`${API_ROUTES.users}/${user?.email}`, fetcher);
+
+  if (usersLoading) return <div>Cargando...</div>;
+  if (usersError) return <div>{usersError?.message}</div>;
+
+  const userRole = userDB?.user?.roleId;
 
   const UserRoleBadge = ({ role }: { role: string }) => {
     if (role === "ADMIN") {
@@ -36,16 +52,17 @@ const Sidebar = () => {
     >
       <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <div className="flex flex-col items-center mb-4">
-          <img
-            src={user?.picture || ""}
+          <Image
+            src={user?.image || ""}
             alt="Foto de Usuario"
             className="w-44 h-44 rounded-full mb-3 mt-20"
+            width={150} height={150}
           />
           <div className="text-center">
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {user?.name}
             </p>
-            <span>
+            <span>              
               <UserRoleBadge role={userRole} />
             </span>
           </div>
@@ -53,20 +70,19 @@ const Sidebar = () => {
 
         <ul className="space-y-2 font-medium mt-20">
           <li>
-            <a
-              href="/inventarios"
+            <Link href="/inventarios"
               className={`flex items-center p-3 text-xl rounded-lg ${
                 currentPath === "/inventarios"
                   ? "text-gray-100 bg-gray-500"
                   : "text-gray-500 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               } group`}
             >
-              <FaBox className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-              <span className="ms-3">Inventarios</span>
-            </a>
+                <FaBox className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                <span className="ms-3">Inventarios</span>
+            </Link>            
           </li>
           <li>
-            <a
+            <Link
               href="/materiales"
               className={`flex items-center p-3 text-xl rounded-lg ${
                 currentPath === "/materiales"
@@ -76,11 +92,11 @@ const Sidebar = () => {
             >
               <FaLemon className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
               <span className="ms-3">Materiales</span>
-            </a>
+            </Link>
           </li>
           {userRole === "ADMIN" && (
             <li>
-              <a
+              <Link
                 href="/usuarios"
                 className={`flex items-center p-3 text-xl rounded-lg ${
                   currentPath === "/usuarios"
@@ -90,17 +106,18 @@ const Sidebar = () => {
               >
                 <FaUser className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
                 <span className="ms-3">Usuarios</span>
-              </a>
+              </Link>
             </li>
           )}
           <li>
-            <a
-              href="/api/auth/logout"
-              className="flex items-center p-3 text-xl text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            <button 
+              onClick={() => {signOut()}}
+              type="button"
+              className="flex items-center w-full p-3 text-xl text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
               <FaSignOutAlt className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
               <span className="ms-3">Logout</span>
-            </a>
+            </button>
           </li>
         </ul>
       </div>
@@ -108,4 +125,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export { Sidebar };

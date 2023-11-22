@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export const Error = () => {
   return (
@@ -25,14 +25,13 @@ export const Error = () => {
           acceder a esta página.
         </div>
       </div>
-      <Link href="/api/auth/login">
-        <button
+      <button
+          onClick={() => {signIn('auth0')}}
           type="button"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-6 py-3 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
           Iniciar Sesión
         </button>
-      </Link>
     </main>
   );
 };

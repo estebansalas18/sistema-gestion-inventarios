@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/sidebar";
+import { Sidebar } from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession } from "next-auth/react";
 import { inventarios_header } from "../data/arrays";
 import { Title } from "@/components/title";
 import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
-import Dropdown from "@/components/dropdown";
+import { Dropdown } from "@/components/dropdown";
 import InventoryChart from "@/components/diagram";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
@@ -13,16 +14,17 @@ import { Button } from "@/components/button";
 import InventarioModal from "@/components/modales/inventarioModal";
 import MaterialService from "@/service/materialservice";
 import InventoryMovementService from "@/service/inventoryMovementService";
+import { InventoryMovement } from "@prisma/client";
 
 interface InventoryContentProps {
   inventory: {
-    id: number;
-    date: string;
+  id: string;
     movementType: string;
     quantity: number;
-    materialId: number;
-    userId: number;
-  }[];
+    materialId: string;
+    userId: string;
+    date: Date;
+  }[];  
 }
 
 const InventoryContent = ({ inventory }: InventoryContentProps) => {
@@ -30,11 +32,12 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { data: materials, error: materialsError } = useSWR(
-    API_ROUTES.materials,
-    MaterialService.getAllMaterials
+  const { data: materials, error: materialsError, isLoading } = useSWR(
+    API_ROUTES.materials, fetcher
   );
 
+  if (isLoading) return <div> cargando... </div>;
+  if (materialsError) return <div> No se pudieron cargar los materiales </div>;
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
@@ -46,9 +49,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     }
   };
 
-  useEffect(() => {
-    fetchMaterialQuantity();
-  }, [selectedMaterial, inventory]);
+  // useEffect(() => {
+  //   fetchMaterialQuantity();
+  // }, [selectedMaterial, inventory]);
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
@@ -67,6 +70,11 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     ...new Set(inventory.map((movement) => movement.materialId)),
   ];
 
+  const revalidateMovements = async () => {
+    // Actualiza los datos llamando a la función `mutate` de useSWR
+    mutate(API_ROUTES.inventoryMovementsSupabase, InventoryMovementService.getAllInventoryMovements);
+  };
+
   return (
     <div className="flex">
       <Sidebar />
@@ -76,7 +84,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
           subtitle={
             selectedMaterial
               ? `Material seleccionado: ${
-                  materials.find((material) => material.id === selectedMaterial)
+                  materials.materials.find((material) => material.id === selectedMaterial)
                     ?.name || `Material ${selectedMaterial}`
                 }`
               : "Selecciona un Material"
@@ -86,7 +94,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
           <div className="flex justify-between">
             <Dropdown
               materialIds={uniqueMaterialIds}
-              materials={materials}
+              materials={materials.materials}
               onSelect={handleMaterialSelect}
               isOpen={dropdownOpen}
               handleDropdownToggle={handleDropdownToggle}
@@ -97,10 +105,11 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               onClick={() => {
                 InventarioModal({
                   name:
-                    materials.find(
+                    materials.materials.find(
                       (material) => material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
-                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovements),
+                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
+
                 });
               }}
               disabled={!selectedMaterial}
@@ -166,19 +175,22 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 };
 
 const Inventarios = () => {
-  const { user, error, isLoading } = useUser();
+  const { data, status } = useSession();
   const {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
-  } = useSWR(API_ROUTES.inventoryMovements, InventoryMovementService.getAllInventoryMovements);
+  } = useSWR(API_ROUTES.inventory, fetcher);
 
-  if (isLoading) return <Loading />;
-  if (error) return <div>{error.message}</div>;
+  const user = data?.user;
+
+  if (status === 'loading') return <Loading />;
+  //if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
-  if (user) return <InventoryContent inventory={inventory} />;
+  const inventarioArray: InventoryMovement[] = Object.values(inventory.inventoryMovements);
+  if (user) return <InventoryContent inventory={inventarioArray} />;
   return <Error />;
 };
 

@@ -1,4 +1,6 @@
 import { supabase } from "@/service/apiConfig";
+import { v4 as uuidv4 } from 'uuid';
+
 
 const MaterialService = {
   getAllMaterials: async () => {
@@ -21,10 +23,12 @@ const MaterialService = {
   createMaterial: async (nombre, saldoInt, userId) => {
     try {
       const currentDate = new Date();
+      const materialId = uuidv4();
       const { data, error } = await supabase
         .from("Material")
         .insert([
           {
+            id: materialId,
             name: nombre,
             quantity: saldoInt,
             userId: userId,
