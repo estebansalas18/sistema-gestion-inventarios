@@ -102,8 +102,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               handleDropdownToggle={handleDropdownToggle}
               toggleDropdown={setDropdownOpen}
             />
-            <PrivateComponent roleName="ADMIN">
-              <Button
+            <Button
                 text="Agregar Movimiento"
                 onClick={() => {
                   InventarioModal({
@@ -118,7 +117,6 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                 disabled={!selectedMaterial}
                 title="Selecciona un material antes de agregar un movimiento."
               />
-            </PrivateComponent>
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">

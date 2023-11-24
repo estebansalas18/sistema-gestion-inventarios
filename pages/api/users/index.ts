@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { User } from "@prisma/client";
 import { prisma } from "@/service/prisma";
+import { checkProtectedApi } from "@/utils/checkServerSession";
 
 type Data = {
     users: User[];
@@ -10,6 +11,9 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
+
+  try{    
+    await checkProtectedApi(req, res, 'ADMIN');
 
     if (req.method === "GET") {
         const users = await prisma.user.findMany();
@@ -23,7 +27,7 @@ export default async function handler(
             email: body.email,
             name: body.name,
             roleId: body.roleId,
-
+  
           },
         });
     
@@ -42,5 +46,9 @@ export default async function handler(
     else {
         res.status(405).json({ response: 'method not allowed' });
     }
+  }
+  catch(error){
+    res.status(500).json({ error });
+  }
 }
 
