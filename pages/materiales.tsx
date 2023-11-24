@@ -3,7 +3,7 @@ import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { materiales_fields, materiales_header } from "@/data/arrays";
 import { Table } from "@/components/table";
-import MaterialModal from "@/components/modales/materialModal"; // Fix import statement
+import { MaterialModal } from "@/components/modales/materialModal"; // Fix import statement
 import { Loading } from "@/components/loading";
 import { Button } from "@/components/button";
 import { Title } from "@/components/title";

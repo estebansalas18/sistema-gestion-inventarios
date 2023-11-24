@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { inventarios_header } from "@/data/arrays";
 import { Title } from "@/components/title";
 import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { Dropdown } from "@/components/dropdown";
-import InventoryChart from "@/components/diagram";
+import { InventoryChart } from "@/components/diagram";
 import { Button } from "@/components/button";
-import InventarioModal from "@/components/modales/inventarioModal";
-import MaterialService from "@/service/materialservice";
+import { InventarioModal } from "@/components/modales/inventarioModal";
+import { MaterialService } from "@/service/materialservice";
 import { InventoryMovementService } from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
 import { PrivateRoute } from "@/components/PrivateRoute";

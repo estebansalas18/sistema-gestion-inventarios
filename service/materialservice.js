@@ -127,4 +127,4 @@ getMaterialQuantity: async (materialId) => {
   }
 },
 };
-export default MaterialService;
+export { MaterialService };
