@@ -33,8 +33,6 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     API_ROUTES.materials, fetcher
   );
 
-  if (isLoading) return <div> cargando... </div>;
-  if (materialsError) return <div> No se pudieron cargar los materiales </div>;
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
@@ -46,9 +44,14 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchMaterialQuantity();
-  // }, [selectedMaterial, inventory]);
+  useEffect(() => {
+    fetchMaterialQuantity();
+ }, [selectedMaterial, inventory]);
+
+ 
+  if (isLoading) return <div> cargando... </div>;
+  if (materialsError) return <div> No se pudieron cargar los materiales </div>;
+
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;

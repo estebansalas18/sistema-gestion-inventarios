@@ -74,6 +74,7 @@ const InventarioModal = async ({ name, revalidateMovements }: InventarioModalPro
   });
 
   if (isConfirmed) {
+    revalidateMovements();
     // Aquí maneja el caso de éxito y muestra la notificación
     const Toast = Swal.mixin({
       toast: true,
