@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
-import MaterialService from "@/service/materialservice";
-import InventoryMovementService from "@/service/inventoryMovementService";
+import { MaterialService } from "@/service/materialservice";
+import { InventoryMovementService } from "@/service/inventoryMovementService";
 
 interface InventarioModalProps {
   name: string;
@@ -96,4 +96,4 @@ const InventarioModal = async ({ name, revalidateMovements }: InventarioModalPro
   }
 };
 
-export default InventarioModal;
+export { InventarioModal };
