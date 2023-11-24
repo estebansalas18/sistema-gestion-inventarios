@@ -1,22 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Sidebar } from "../components/sidebar";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { useSession } from "next-auth/react";
-import { inventarios_header } from "../data/arrays";
+import { Sidebar } from "@/components/sidebar";
+import { inventarios_header } from "@/data/arrays";
 import { Title } from "@/components/title";
 import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { Dropdown } from "@/components/dropdown";
 import InventoryChart from "@/components/diagram";
-import { Loading } from "@/components/loading";
-import { Error } from "@/components/error";
 import { Button } from "@/components/button";
 import InventarioModal from "@/components/modales/inventarioModal";
 import MaterialService from "@/service/materialservice";
-import InventoryMovementService from "@/service/inventoryMovementService";
+import { InventoryMovementService } from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
 import { PrivateRoute } from "@/components/PrivateRoute";
-import { PrivateComponent } from "@/components/PrivateComponent";
 
 interface InventoryContentProps {
   inventory: {
@@ -51,9 +46,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchMaterialQuantity();
-  // }, [selectedMaterial, inventory]);
+  useEffect(() => {
+    fetchMaterialQuantity();
+  }, [selectedMaterial, inventory]);
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
@@ -183,24 +178,17 @@ const InventoryWrapper = () => {
    );
 }
 
-const Inventarios = () => {
-  const { data, status } = useSession();
+const Inventarios = () => {  
   const {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
-  } = useSWR(API_ROUTES.inventory, fetcher);
+  } = useSWR(API_ROUTES.inventory, fetcher);  
 
-  const user = data?.user;
-
-  if (status === 'loading') return <Loading />;
-  //if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
-
   const inventarioArray: InventoryMovement[] = Object.values(inventory.inventoryMovements);
-  if (user) return <InventoryContent inventory={inventarioArray} />;
-  return <Error />;
+  return <InventoryContent inventory={inventarioArray} />
 };
 
 export default InventoryWrapper;

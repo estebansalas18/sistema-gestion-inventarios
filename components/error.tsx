@@ -1,6 +1,6 @@
 import { signIn } from "next-auth/react";
 
-export const Error = () => {
+const Error = () => {
   return (
     <main
       className="h-screen w-full flex flex-col items-center justify-center"
@@ -35,3 +35,5 @@ export const Error = () => {
     </main>
   );
 };
+
+export { Error };

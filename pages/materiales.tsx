@@ -1,7 +1,4 @@
-import { Sidebar }from "../components/sidebar";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { useSession } from "next-auth/react";
-import { Error } from "../components/error";
+import { Sidebar }from "@/components/sidebar";
 import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { materiales_fields, materiales_header } from "@/data/arrays";
@@ -22,52 +19,42 @@ const MaterialsWrapper = () => {
   );
 }
 
-const Materiales = () => {
-  const { data, status } = useSession();
-  const user = data?.user;  
-
+const Materiales = () => { 
   const {
     data: materials,
     error: materialsError,
     isLoading: materialssLoading,
   } = useSWR(API_ROUTES.materials, fetcher);
-
-  if (status === 'loading') return <Loading />;
-  //if (error) return <div>{error.message}</div>;
-
+  
   const revalidateMaterials = async () => {
     // Actualiza los datos llamando a la función `mutate` de useSWR
     mutate(API_ROUTES.materials);
   };
-  
-  if (user) {
-    if (materialssLoading) return <div>Cargando...</div>;
-    if (materialsError) return <div>No se pudieron cargar los materiales</div>;
 
-    return (
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-1 mt-20 pl-80 relative">
-          <Title title="Gestión de Materiales" />
-          <div className="px-28 py-5 ">
-            <PrivateComponent roleName="ADMIN">
-              <div className="text-right">
-                <Button text="Agregar Material" onClick={() => MaterialModal(revalidateMaterials)} />
-              </div>
-            </PrivateComponent>
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-              <Table
-                headers={materiales_header}
-                rows={materials.materials}
-                fieldsToShow={materiales_fields}
-              />
+  if (materialssLoading) return <Loading />;
+  if (materialsError) return <div>No se pudieron cargar los materiales</div>;
+  return (
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1 mt-20 pl-80 relative">
+        <Title title="Gestión de Materiales" />
+        <div className="px-28 py-5 ">
+          <PrivateComponent roleName="ADMIN">
+            <div className="text-right">
+              <Button text="Agregar Material" onClick={() => MaterialModal(revalidateMaterials)} />
             </div>
+          </PrivateComponent>
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <Table
+              headers={materiales_header}
+              rows={materials.materials}
+              fieldsToShow={materiales_fields}
+            />
           </div>
         </div>
       </div>
-    );
-  }
-  return <Error />;
+    </div>
+  );  
 };
 
 export default MaterialsWrapper;
