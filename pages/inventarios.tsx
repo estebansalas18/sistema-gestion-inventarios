@@ -108,7 +108,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                       materials.materials.find(
                         (material) => material.id === selectedMaterial
                       )?.name || `Material ${selectedMaterial}`,
-                    revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
+                    revalidateMovements: () => mutate(API_ROUTES.inventory),
 
                   });
                 }}
