@@ -10,7 +10,8 @@ import { Title } from "@/components/title";
 import { UsuarioModal } from "@/components/modales/usuarioModal";
 
 const Usuarios = () => {
-  const { data, status } = useSession();
+  const { data, status } = useSession();  
+
   //const { users, usersError, usersLoading } = useGetUsers();
   const {
     data: usersData,

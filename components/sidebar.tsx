@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import useSWR from "swr";
+import { PrivateComponent } from "./PrivateComponent";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -93,22 +94,22 @@ const Sidebar = () => {
               <FaLemon className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
               <span className="ms-3">Materiales</span>
             </Link>
-          </li>
-          {userRole === "ADMIN" && (
+          </li>          
+          <PrivateComponent roleName="ADMIN">
             <li>
-              <Link
-                href="/usuarios"
-                className={`flex items-center p-3 text-xl rounded-lg ${
-                  currentPath === "/usuarios"
-                    ? "text-gray-100 bg-gray-500"
-                    : "text-gray-500 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                } group`}
-              >
-                <FaUser className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ms-3">Usuarios</span>
-              </Link>
-            </li>
-          )}
+                <Link
+                  href="/usuarios"
+                  className={`flex items-center p-3 text-xl rounded-lg ${
+                    currentPath === "/usuarios"
+                      ? "text-gray-100 bg-gray-500"
+                      : "text-gray-500 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                  } group`}
+                >
+                  <FaUser className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                  <span className="ms-3">Usuarios</span>
+                </Link>
+              </li>
+            </PrivateComponent>
           <li>
             <button 
               onClick={() => {signOut()}}
