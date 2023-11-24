@@ -26,6 +26,17 @@ export default async function handler(
         });    
         res.status(200).json({ newMaterial });
     }
+    else if (req.method === 'PUT') {
+        const { body } = req;    
+        const newMaterial = await prisma.material.update({
+          where: {id: body.id},
+          data: {
+            quantity: body.quantity,
+            updatedAt: new Date(),
+          }
+        });    
+        res.status(200).json({ newMaterial });
+    } 
     else{
         res.status(405).json({ response: 'method not allowed' });
     }    
