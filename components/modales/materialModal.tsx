@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import MaterialService from "@/service/materialservice";
-import InventoryMovementService from "@/service/inventoryMovementService";
+import { InventoryMovementService } from "@/service/inventoryMovementService";
 
 const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; }) => {
   const { value: formValues, dismiss } = await Swal.fire({

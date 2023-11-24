@@ -1,10 +1,6 @@
 import Swal from "sweetalert2";
 import MaterialService from "@/service/materialservice";
-import InventoryMovementService from "@/service/inventoryMovementService";
-
-interface InventarioModalProps {
-  name: string;
-}
+import { InventoryMovementService } from "@/service/inventoryMovementService";
 
 interface InventarioModalProps {
   name: string;
@@ -74,6 +70,7 @@ const InventarioModal = async ({ name, revalidateMovements }: InventarioModalPro
   });
 
   if (isConfirmed) {
+    revalidateMovements();
     // Aquí maneja el caso de éxito y muestra la notificación
     const Toast = Swal.mixin({
       toast: true,
