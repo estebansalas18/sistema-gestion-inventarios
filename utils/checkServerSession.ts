@@ -21,6 +21,8 @@ const checkProtectedApi = async (req: NextApiRequest, res: NextApiResponse, role
     if(session.user.role?.name !== roleName){
         return res.status(403).json({ response: 'Forbidden' })
     }
+
+    return session.user.role.name;
 }
 
 export { checkPrivateApi, checkProtectedApi };
