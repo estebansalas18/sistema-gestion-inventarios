@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import { API_ROUTES } from "@/service/apiConfig";
+import { mutate } from "swr";
 
 interface UsuarioModalProps {
   name: string;
@@ -31,6 +32,7 @@ export const UsuarioModal = async ({ name, email }: UsuarioModalProps) => {
       .then( response => {
       })
       .then( () => {
+        mutate(API_ROUTES.users);
         Swal.fire(
           "Usuario actualizado correctamente",
           "",
