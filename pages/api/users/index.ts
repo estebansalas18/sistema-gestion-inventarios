@@ -11,7 +11,6 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
-
   try{    
     await checkProtectedApi(req, res, 'ADMIN');
 

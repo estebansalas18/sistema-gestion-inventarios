@@ -11,37 +11,42 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  await checkPrivateApi(req, res);
+  try{
+    await checkPrivateApi(req, res);
 
-  if (req.method === "GET") {
-    const materials = await prisma.material.findMany();
-    res.status(200).json({ materials });
-  } 
-  else {
-    await checkProtectedApi(req, res, "ADMIN");
-    if (req.method === "POST") {
-      const { body } = req;
-      const newMaterial = await prisma.material.create({
-        data: {
-          name: body.name,
-          quantity: body.quantity,
-          userId: body.userId,
-        },
-      });
-      res.status(200).json({ newMaterial });
-    } else if (req.method === "PUT") {
-      const { body } = req;
-      const newMaterial = await prisma.material.update({
-        where: { id: body.id },
-        data: {
-          quantity: body.quantity,
-          updatedAt: new Date(),
-        },
-      });
-      res.status(200).json({ newMaterial });
+    if (req.method === "GET") {
+      const materials = await prisma.material.findMany();
+      res.status(200).json({ materials });
     } 
     else {
-      res.status(405).json({ response: "method not allowed" });
+      await checkProtectedApi(req, res, "ADMIN");
+      if (req.method === "POST") {
+        const { body } = req;
+        const newMaterial = await prisma.material.create({
+          data: {
+            name: body.name,
+            quantity: body.quantity,
+            userId: body.userId,
+          },
+        });
+        res.status(200).json({ newMaterial });
+      } else if (req.method === "PUT") {
+        const { body } = req;
+        const newMaterial = await prisma.material.update({
+          where: { id: body.id },
+          data: {
+            quantity: body.quantity,
+            updatedAt: new Date(),
+          },
+        });
+        res.status(200).json({ newMaterial });
+      } 
+      else {
+        res.status(405).json({ response: "method not allowed" });
+      }
     }
+  }
+  catch(error){
+    res.status(500).json({ error });
   }
 }

@@ -4,12 +4,17 @@ import { checkPrivateApi } from "@/utils/checkServerSession";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    await checkPrivateApi(req, res);
-    const { name } = req.query;
-    const material = await prisma.material.findUnique({
-        where: {
-            name: name,
-        },
-    });
-    res.status(200).json({ material });
+    try{
+        await checkPrivateApi(req, res);
+        const { name } = req.query;
+        const material = await prisma.material.findUnique({
+            where: {
+                name: name,
+            },
+        });
+        res.status(200).json({ material });  
+    }
+    catch(error){
+        res.status(500).json({ error });
+    }    
 }

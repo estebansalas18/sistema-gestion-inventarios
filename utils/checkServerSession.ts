@@ -9,6 +9,7 @@ const checkPrivateApi = async (req: NextApiRequest, res: NextApiResponse) => {
     if(!session){
       return res.status(401).json({ response: 'Unauthorized' });
     }    
+    return session.user.role?.name;
 };
 
 const checkProtectedApi = async (req: NextApiRequest, res: NextApiResponse, roleName: Enum_RoleName) => {
