@@ -15,6 +15,8 @@ import InventarioModal from "@/components/modales/inventarioModal";
 import MaterialService from "@/service/materialservice";
 import InventoryMovementService from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
+import { PrivateRoute } from "@/components/PrivateRoute";
+import { PrivateComponent } from "@/components/PrivateComponent";
 
 interface InventoryContentProps {
   inventory: {
@@ -100,22 +102,23 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               handleDropdownToggle={handleDropdownToggle}
               toggleDropdown={setDropdownOpen}
             />
-            <Button
-              text="Agregar Movimiento"
-              onClick={() => {
-                InventarioModal({
-                  name:
-                    materials.materials.find(
-                      (material) => material.id === selectedMaterial
-                    )?.name || `Material ${selectedMaterial}`,
-                  revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
+            <PrivateComponent roleName="ADMIN">
+              <Button
+                text="Agregar Movimiento"
+                onClick={() => {
+                  InventarioModal({
+                    name:
+                      materials.materials.find(
+                        (material) => material.id === selectedMaterial
+                      )?.name || `Material ${selectedMaterial}`,
+                    revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
 
-                });
-              }}
-              disabled={!selectedMaterial}
-              title="Selecciona un material antes de agregar un movimiento."
-            />
-
+                  });
+                }}
+                disabled={!selectedMaterial}
+                title="Selecciona un material antes de agregar un movimiento."
+              />
+            </PrivateComponent>
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -174,6 +177,14 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   );
 };
 
+const InventoryWrapper = () => {
+   return(
+    <PrivateRoute>
+      <Inventarios />
+    </PrivateRoute>
+   );
+}
+
 const Inventarios = () => {
   const { data, status } = useSession();
   const {
@@ -194,4 +205,4 @@ const Inventarios = () => {
   return <Error />;
 };
 
-export default Inventarios;
+export default InventoryWrapper;
