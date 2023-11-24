@@ -10,6 +10,15 @@ import { Title } from "@/components/title";
 import { UsuarioModal } from "@/components/modales/usuarioModal";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
+
+const UsersPageWrapper = () => {
+  return(
+  <ProtectedRoute roleName="ADMIN">
+    <Usuarios />
+  </ProtectedRoute>
+  );
+}
+
 const Usuarios = () => {
   const { data, status } = useSession();  
 
@@ -52,4 +61,4 @@ const Usuarios = () => {
   return <Error />;
 };
 
-export default Usuarios;
+export default UsersPageWrapper;
