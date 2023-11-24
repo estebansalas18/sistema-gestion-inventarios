@@ -4,8 +4,6 @@ import { useSession, signOut  } from "next-auth/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { API_ROUTES, fetcher } from "@/service/apiConfig";
-import useSWR from "swr";
 import { PrivateComponent } from "./PrivateComponent";
 
 const Sidebar = () => {
@@ -13,19 +11,10 @@ const Sidebar = () => {
   const currentPath = router.pathname;
   const { data , status} = useSession();
   const user = data?.user;
+  const userRole = data?.user.role?.name;
 
   if(status === "loading") return <div>Cargando...</div>;
-
-  const {
-    data: userDB,
-    error: usersError,
-    isLoading: usersLoading,
-  } = useSWR(`${API_ROUTES.users}/${user?.email}`, fetcher);
-
-  if (usersLoading) return <div>Cargando...</div>;
-  if (usersError) return <div>{usersError?.message}</div>;
-
-  const userRole = userDB?.user?.roleId;
+  if(status === "unauthenticated") return <div>Debes iniciar sesión</div>;
 
   const UserRoleBadge = ({ role }: { role: string }) => {
     if (role === "ADMIN") {

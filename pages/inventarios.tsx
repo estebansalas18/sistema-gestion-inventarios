@@ -46,9 +46,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     }
   };
 
-  useEffect(() => {
-    fetchMaterialQuantity();
-  }, [selectedMaterial, inventory]);
+  // useEffect(() => {
+  //   fetchMaterialQuantity();
+  // }, [selectedMaterial, inventory]);
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
