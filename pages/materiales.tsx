@@ -10,6 +10,17 @@ import MaterialModal from "@/components/modales/materialModal"; // Fix import st
 import { Loading } from "@/components/loading";
 import { Button } from "@/components/button";
 import { Title } from "@/components/title";
+import { PrivateRoute } from "@/components/PrivateRoute";
+import { PrivateComponent } from "@/components/PrivateComponent";
+
+
+const MaterialsWrapper = () => {
+  return(
+    <PrivateRoute>
+      <Materiales />
+    </PrivateRoute>
+  );
+}
 
 const Materiales = () => {
   const { data, status } = useSession();
@@ -39,9 +50,11 @@ const Materiales = () => {
         <div className="flex-1 mt-20 pl-80 relative">
           <Title title="Gestión de Materiales" />
           <div className="px-28 py-5 ">
-            <div className="text-right">
-              <Button text="Agregar Material" onClick={() => MaterialModal(revalidateMaterials)} />
-            </div>
+            <PrivateComponent roleName="ADMIN">
+              <div className="text-right">
+                <Button text="Agregar Material" onClick={() => MaterialModal(revalidateMaterials)} />
+              </div>
+            </PrivateComponent>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
               <Table
                 headers={materiales_header}
@@ -57,4 +70,4 @@ const Materiales = () => {
   return <Error />;
 };
 
-export default Materiales;
+export default MaterialsWrapper;
