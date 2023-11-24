@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { inventarios_header } from "@/data/arrays";
 import { Title } from "@/components/title";
