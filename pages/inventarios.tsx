@@ -12,6 +12,8 @@ import { MaterialService } from "@/service/materialservice";
 import { InventoryMovementService } from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
 import { PrivateRoute } from "@/components/PrivateRoute";
+import { useSession } from "next-auth/react";
+import { Loading } from "@/components/loading";
 
 interface InventoryContentProps {
   inventory: InventoryMovement[];
@@ -21,13 +23,6 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const [materialQuantity, setMaterialQuantity] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState<string>();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const {
-    data: materials,
-    error: materialsError,
-    isLoading,
-  } = useSWR(API_ROUTES.materials, fetcher);
-
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
@@ -44,6 +39,20 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     fetchMaterialQuantity();
   }, [selectedMaterial, inventory]);
 
+  const {
+    data: materials,
+    error: materialsError,
+    isLoading,
+  } = useSWR(API_ROUTES.materials, fetcher);
+
+  const { data, status } = useSession();
+  if (status !== "authenticated") return <div>Cargando...</div>;
+  const user = data.user;
+  const { data: userData, isLoading: userLoading } = useSWR(API_ROUTES.users + "/" + user.email, fetcher);
+  if (userLoading) return <Loading />;  
+  const userId = userData.user.id;
+
+  
   if (isLoading) return <div> cargando... </div>;
   if (materialsError) return <div> No se pudieron cargar los materiales </div>;
 
@@ -109,6 +118,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                         material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
                   revalidateMovements: () => mutate(API_ROUTES.inventory),
+                  userId,
                 });
               }}
               disabled={!selectedMaterial}
