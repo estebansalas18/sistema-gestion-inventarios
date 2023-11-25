@@ -24,7 +24,15 @@ const InventoryMovementService = {
   },
   
   createInventoryMovement: async (movementType, quantity, materialId, userId) => {
-    try {      
+    try { 
+      const materialBalance = await MaterialService.getMaterialBalance(materialId);
+
+      // Validar si es un movimiento de salida y la cantidad es mayor al saldo
+      if (movementType === "SALIDA" && quantity > materialBalance) {
+        throw ("La cantidad de salida es mayor al saldo del material");
+        return null; // Devolver null o algún valor indicativo de error
+      }
+      
       // Crear el movimiento de inventario
       const movementId = uuidv4();
       const { data: newMovement, error: movementError } = await supabase
@@ -45,9 +53,6 @@ const InventoryMovementService = {
         console.log("Se vino derecho")
         throw "Se vino derecho";
       }
-
-      // Obtener el saldo actual del material
-      const materialBalance = await MaterialService.getMaterialBalance(materialId);
 
       // Actualizar el saldo del material
       await supabase

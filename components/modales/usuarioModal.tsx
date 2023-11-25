@@ -20,6 +20,7 @@ export const UsuarioModal = async ({ name, email }: UsuarioModalProps) => {
     },
     inputPlaceholder: "Seleccionar el rol del usuario",
     showCancelButton: true,
+    cancelButtonText: "Cancelar",
     confirmButtonText: "Editar Usuario",
   }).then((result) => {
     if (result.isConfirmed) {
