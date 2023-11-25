@@ -4,8 +4,8 @@ import { InventoryMovementService } from "@/service/inventoryMovementService";
 
 const MaterialModal = async (revalidateCallback: {
   (): Promise<void>;
-  (): void;
-}) => {
+  (): void;},
+  userId: string) => {
   const { value: formValues, dismiss } = await Swal.fire({
     title: "Agregar Material",
     html: `
@@ -56,7 +56,7 @@ const MaterialModal = async (revalidateCallback: {
         const newMaterial = await MaterialService.createMaterial(
           nombre,
           saldoInt,
-          "test2"
+          userId
         );
 
         // Crear el movimiento de inventario
@@ -64,7 +64,7 @@ const MaterialModal = async (revalidateCallback: {
           "ENTRADA", // Ajusta el tipo de movimiento según tus necesidades
           saldoInt,
           newMaterial.id,
-          "test2"
+          userId
         );
 
         // Invocar la función de devolución de llamada para revalidar los datos
