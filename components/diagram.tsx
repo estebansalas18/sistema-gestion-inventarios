@@ -67,39 +67,43 @@ const InventoryChart: React.FC<InventoryChartProps> = ({
     const { labels, data } = chartData;
 
     // Limpiar el lienzo
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx?.clearRect(0, 0, canvas.width, canvas.height);
 
     // Dibujar ejes y etiquetas
     const xAxisHeight = 20;
     const yAxisWidth = 30;
 
     // Eje x
-    ctx.beginPath();
-    ctx.moveTo(yAxisWidth, canvas.height - xAxisHeight);
-    ctx.lineTo(canvas.width, canvas.height - xAxisHeight);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
+    ctx?.beginPath();
+    ctx?.moveTo(yAxisWidth, canvas.height - xAxisHeight);
+    ctx?.lineTo(canvas.width, canvas.height - xAxisHeight);
+    if (ctx) {
+      ctx.strokeStyle = "black";
+    }
+    ctx?.stroke();
 
     // Etiquetas del eje x
     for (let i = 0; i < labels.length; i++) {
       const x =
         yAxisWidth + (i * (canvas.width - yAxisWidth)) / (labels.length - 1);
-      ctx.fillText(labels[i], x, canvas.height - xAxisHeight + 15);
+      ctx?.fillText(labels[i], x, canvas.height - xAxisHeight + 15);
     }
 
     // Eje y
-    ctx.beginPath();
-    ctx.moveTo(yAxisWidth, 0);
-    ctx.lineTo(yAxisWidth, canvas.height - xAxisHeight);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
+    ctx?.beginPath();
+    ctx?.moveTo(yAxisWidth, 0);
+    ctx?.lineTo(yAxisWidth, canvas.height - xAxisHeight);
+    if (ctx) {
+      ctx.strokeStyle = "black";
+    }
+    ctx?.stroke();
 
     // Etiquetas del eje y
     const maxBalance = Math.max(...data);
     for (let i = 0; i <= 5; i++) {
       const y = (i / 5) * (canvas.height - xAxisHeight);
       const balance = Math.round((i / 5) * maxBalance);
-      ctx.fillText(
+      ctx?.fillText(
         balance.toString(),
         yAxisWidth - 25,
         canvas.height - xAxisHeight - y
@@ -107,8 +111,8 @@ const InventoryChart: React.FC<InventoryChartProps> = ({
     }
 
     // Dibujar la línea del gráfico
-    ctx.beginPath();
-    ctx.moveTo(yAxisWidth, canvas.height - xAxisHeight);
+    ctx?.beginPath();
+    ctx?.moveTo(yAxisWidth, canvas.height - xAxisHeight);
     const spacingX = (canvas.width - yAxisWidth) / (labels.length - 1);
 
     for (let i = 0; i < labels.length; i++) {
@@ -117,11 +121,13 @@ const InventoryChart: React.FC<InventoryChartProps> = ({
         canvas.height -
         xAxisHeight -
         (data[i] / maxBalance) * (canvas.height - xAxisHeight);
-      ctx.lineTo(x, y);
+      ctx?.lineTo(x, y);
     }
 
-    ctx.strokeStyle = "blue";
-    ctx.stroke();
+    if (ctx) {
+      ctx.strokeStyle = "blue";
+    }
+    ctx?.stroke();
   };
 
   useEffect(() => {

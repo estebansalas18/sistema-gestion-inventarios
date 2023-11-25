@@ -1,18 +1,21 @@
 import React from "react";
 import { Button } from "@/components/button";
 
+interface RowProps {
+  id: number;
+  createdAt: string;
+  name: string;
+  quantity: number;
+  userId: number;
+  [key: string]: string | number;
+}
+
 interface TableProps {
   headers: string[];
-  rows: Array<{
-    id: number;
-    createdAt: string;
-    name: string;
-    quantity: number;
-    userId: number;
-  }>;
+  rows: RowProps[];
   fieldsToShow?: string[];
   actions?: boolean;
-  onClick: () => void;
+  onClick: (row: RowProps) => void;
 }
 
 const Table = ({

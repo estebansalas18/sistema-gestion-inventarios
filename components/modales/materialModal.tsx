@@ -1,8 +1,11 @@
 import Swal from "sweetalert2";
 import MaterialService from "@/service/materialservice";
-import InventoryMovementService from "@/service/inventoryMovementService";
+import { InventoryMovementService } from "@/service/inventoryMovementService";
 
-const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; }) => {
+const MaterialModal = async (revalidateCallback: {
+  (): Promise<void>;
+  (): void;
+}) => {
   const { value: formValues, dismiss } = await Swal.fire({
     title: "Agregar Material",
     html: `
@@ -13,8 +16,12 @@ const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; 
     confirmButtonText: "Agregar",
     focusConfirm: false,
     preConfirm: async () => {
-      const nombreInput = Swal.getPopup()?.querySelector("#nombre") as HTMLInputElement;
-      const saldoInput = Swal.getPopup()?.querySelector("#saldo") as HTMLInputElement;
+      const nombreInput = Swal.getPopup()?.querySelector(
+        "#nombre"
+      ) as HTMLInputElement;
+      const saldoInput = Swal.getPopup()?.querySelector(
+        "#saldo"
+      ) as HTMLInputElement;
 
       if (!nombreInput || !saldoInput) {
         Swal.showValidationMessage("Completa todos los campos");
@@ -37,7 +44,8 @@ const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; 
 
       try {
         // Verificar si el nombre del material ya existe en la tabla
-        const materialExists = await MaterialService.checkMaterialExists(nombre);
+        const materialExists =
+          await MaterialService.checkMaterialExists(nombre);
 
         if (materialExists) {
           Swal.showValidationMessage("Ya existe un material con ese nombre");
@@ -45,7 +53,11 @@ const MaterialModal = async (revalidateCallback: { (): Promise<void>; (): void; 
         }
 
         // Crear el material
-        const newMaterial = await MaterialService.createMaterial(nombre, saldoInt, "test2");
+        const newMaterial = await MaterialService.createMaterial(
+          nombre,
+          saldoInt,
+          "test2"
+        );
 
         // Crear el movimiento de inventario
         await InventoryMovementService.createInventoryMovement(

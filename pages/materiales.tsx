@@ -1,4 +1,4 @@
-import { Sidebar }from "../components/sidebar";
+import { Sidebar } from "../components/sidebar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useSession } from "next-auth/react";
 import { Error } from "../components/error";
@@ -13,18 +13,17 @@ import { Title } from "@/components/title";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { PrivateComponent } from "@/components/PrivateComponent";
 
-
 const MaterialsWrapper = () => {
-  return(
+  return (
     <PrivateRoute>
       <Materiales />
     </PrivateRoute>
   );
-}
+};
 
 const Materiales = () => {
   const { data, status } = useSession();
-  const user = data?.user;  
+  const user = data?.user;
 
   const {
     data: materials,
@@ -32,14 +31,14 @@ const Materiales = () => {
     isLoading: materialssLoading,
   } = useSWR(API_ROUTES.materials, fetcher);
 
-  if (status === 'loading') return <Loading />;
+  if (status === "loading") return <Loading />;
   //if (error) return <div>{error.message}</div>;
 
   const revalidateMaterials = async () => {
     // Actualiza los datos llamando a la función `mutate` de useSWR
     mutate(API_ROUTES.materials);
   };
-  
+
   if (user) {
     if (materialssLoading) return <div>Cargando...</div>;
     if (materialsError) return <div>No se pudieron cargar los materiales</div>;
@@ -52,7 +51,10 @@ const Materiales = () => {
           <div className="px-28 py-5 ">
             <PrivateComponent roleName="ADMIN">
               <div className="text-right">
-                <Button text="Agregar Material" onClick={() => MaterialModal(revalidateMaterials)} />
+                <Button
+                  text="Agregar Material"
+                  onClick={() => MaterialModal(revalidateMaterials)}
+                />
               </div>
             </PrivateComponent>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">

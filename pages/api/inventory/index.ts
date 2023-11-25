@@ -4,7 +4,8 @@ import { prisma } from "@/service/prisma";
 import { checkPrivateApi } from "@/utils/checkServerSession";
 
 type Data = {
-    inventoryMovements: InventoryMovement[];
+    inventoryMovements?: InventoryMovement[];
+    message?: string;
 };
 
 export default async function handler(
@@ -18,7 +19,7 @@ export default async function handler(
     }
     else if (req.method === "POST"){
         const { body } = req;    
-        const newInventoryMovement = await prisma.inventoryMovement.create({
+        const newInventoryMovement: InventoryMovement = await prisma.inventoryMovement.create({
           data: {
             movementType: body.movementType,
             quantity: body.quantity,
@@ -27,9 +28,9 @@ export default async function handler(
             date: body.date,         
           },
         });    
-        res.status(200).json({ newInventoryMovement });
+        res.status(200).json({ inventoryMovements: [ newInventoryMovement ]});
     }
     else{
-        res.status(405).json({ response: 'method not allowed' });
+        res.status(405).json({ message: 'method not allowed' });
     }    
 }

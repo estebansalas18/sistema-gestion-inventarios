@@ -36,9 +36,11 @@ const ProtectedRoute = ({ children, roleName }: ProtectedRouteProps) => {
           <div>
             <span className="font-medium">¡Buen Intento!</span> No tienes
             permiso para acceder a esta página :3
-          </div>          
+          </div>
         </div>
-        <Link href="/" className="text-red-400 text-2xl">Regresar al inicio</Link>
+        <Link href="/" className="text-red-400 text-2xl">
+          Regresar al inicio
+        </Link>
       </main>
     </PrivateRoute>
   );

@@ -20,13 +20,13 @@ import { PrivateComponent } from "@/components/PrivateComponent";
 
 interface InventoryContentProps {
   inventory: {
-  id: string;
+    id: string;
     movementType: string;
     quantity: number;
     materialId: string;
     userId: string;
     date: Date;
-  }[];  
+  }[];
 }
 
 const InventoryContent = ({ inventory }: InventoryContentProps) => {
@@ -34,16 +34,19 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { data: materials, error: materialsError, isLoading } = useSWR(
-    API_ROUTES.materials, fetcher
-  );
+  const {
+    data: materials,
+    error: materialsError,
+    isLoading,
+  } = useSWR(API_ROUTES.materials, fetcher);
 
   if (isLoading) return <div> cargando... </div>;
   if (materialsError) return <div> No se pudieron cargar los materiales </div>;
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
-        const quantity = await MaterialService.getMaterialQuantity(selectedMaterial);
+        const quantity =
+          await MaterialService.getMaterialQuantity(selectedMaterial);
         setMaterialQuantity(quantity);
       } catch (error) {
         console.error("Error al obtener la cantidad del material:", error);
@@ -74,7 +77,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 
   const revalidateMovements = async () => {
     // Actualiza los datos llamando a la función `mutate` de useSWR
-    mutate(API_ROUTES.inventoryMovementsSupabase, InventoryMovementService.getAllInventoryMovements);
+    mutate(
+      API_ROUTES.inventoryMovementsSupabase,
+      InventoryMovementService.getAllInventoryMovements
+    );
   };
 
   return (
@@ -86,8 +92,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
           subtitle={
             selectedMaterial
               ? `Material seleccionado: ${
-                  materials.materials.find((material) => material.id === selectedMaterial)
-                    ?.name || `Material ${selectedMaterial}`
+                  materials.materials.find(
+                    (material) => material.id === selectedMaterial
+                  )?.name || `Material ${selectedMaterial}`
                 }`
               : "Selecciona un Material"
           }
@@ -103,20 +110,20 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               toggleDropdown={setDropdownOpen}
             />
             <Button
-                text="Agregar Movimiento"
-                onClick={() => {
-                  InventarioModal({
-                    name:
-                      materials.materials.find(
-                        (material) => material.id === selectedMaterial
-                      )?.name || `Material ${selectedMaterial}`,
-                    revalidateMovements: () => mutate(API_ROUTES.inventoryMovementsSupabase),
-
-                  });
-                }}
-                disabled={!selectedMaterial}
-                title="Selecciona un material antes de agregar un movimiento."
-              />
+              text="Agregar Movimiento"
+              onClick={() => {
+                InventarioModal({
+                  name:
+                    materials.materials.find(
+                      (material) => material.id === selectedMaterial
+                    )?.name || `Material ${selectedMaterial}`,
+                  revalidateMovements: () =>
+                    mutate(API_ROUTES.inventoryMovementsSupabase),
+                });
+              }}
+              disabled={!selectedMaterial}
+              title="Selecciona un material antes de agregar un movimiento."
+            />
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -160,10 +167,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
             </table>
           </div>
           <div className="justify-end mt-10">
-          <Title
-            title={`Cantidad del material seleccionado: ${materialQuantity}`}
-            subtitle="Saldo total"
-          />
+            <Title
+              title={`Cantidad del material seleccionado: ${materialQuantity}`}
+              subtitle="Saldo total"
+            />
             <InventoryChart
               selectedMaterial={selectedMaterial}
               inventory={inventory}
@@ -176,12 +183,12 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 };
 
 const InventoryWrapper = () => {
-   return(
+  return (
     <PrivateRoute>
       <Inventarios />
     </PrivateRoute>
-   );
-}
+  );
+};
 
 const Inventarios = () => {
   const { data, status } = useSession();
@@ -193,12 +200,14 @@ const Inventarios = () => {
 
   const user = data?.user;
 
-  if (status === 'loading') return <Loading />;
+  if (status === "loading") return <Loading />;
   //if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
 
-  const inventarioArray: InventoryMovement[] = Object.values(inventory.inventoryMovements);
+  const inventarioArray: InventoryMovement[] = Object.values(
+    inventory.inventoryMovements
+  );
   if (user) return <InventoryContent inventory={inventarioArray} />;
   return <Error />;
 };

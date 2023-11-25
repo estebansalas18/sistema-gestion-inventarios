@@ -10,17 +10,16 @@ import { Title } from "@/components/title";
 import { UsuarioModal } from "@/components/modales/usuarioModal";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-
 const UsersPageWrapper = () => {
-  return(
-  <ProtectedRoute roleName="ADMIN">
-    <Usuarios />
-  </ProtectedRoute>
+  return (
+    <ProtectedRoute roleName="ADMIN">
+      <Usuarios />
+    </ProtectedRoute>
   );
-}
+};
 
 const Usuarios = () => {
-  const { data, status } = useSession();  
+  const { data, status } = useSession();
 
   //const { users, usersError, usersLoading } = useGetUsers();
   const {
@@ -28,16 +27,15 @@ const Usuarios = () => {
     error: usersError,
     isLoading: usersLoading,
   } = useSWR(API_ROUTES.users, fetcher);
- 
 
-  if (status === 'loading' || usersLoading) return <div>Cargando...</div>;
+  if (status === "loading" || usersLoading) return <div>Cargando...</div>;
   //if (userError) return <div>{userError?.message}</div>;
   if (usersError) return <div>{usersError?.message}</div>;
 
-  if (status === 'authenticated') {
+  if (status === "authenticated") {
     const users = usersData.users;
     return (
-      <ProtectedRoute roleName="ADMIN">        
+      <ProtectedRoute roleName="ADMIN">
         <div className="flex">
           <Sidebar />
           <div className="flex-1 mt-20 pl-80">
@@ -49,8 +47,10 @@ const Usuarios = () => {
                   rows={users}
                   fieldsToShow={usuarios_fields}
                   actions={true}
-                  onClick={(row) => UsuarioModal({ name: row.name, email:row.email })}
-                  />
+                  onClick={(row) =>
+                    UsuarioModal({ name: row.name, email: row.email })
+                  }
+                />
               </div>
             </div>
           </div>
