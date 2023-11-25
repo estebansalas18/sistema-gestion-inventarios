@@ -1,14 +1,14 @@
 import { useRef, useEffect } from "react";
 
 interface DropdownProps {
-  materialIds: number[];
+  materialIds: string[];
   materials: Array<{
-    id: number;
+    id: string;
     name: string;
   }>;
-  onSelect: (materialId: number) => void;
+  onSelect: (materialId: string) => void;
   isOpen: boolean;
-  handleDropdownToggle: () => void;
+  handleDropdownToggle: (event: React.MouseEvent<HTMLButtonElement>) => void;
   toggleDropdown: (isOpen: boolean) => void;
 }
 

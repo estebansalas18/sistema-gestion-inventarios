@@ -4,7 +4,9 @@ import { prisma } from "@/service/prisma";
 import { checkPrivateApi, checkProtectedApi } from "@/utils/checkServerSession";
 
 type Data = {
-  materials: Material[];
+  materials?: Material[];
+  message?: string;
+  error?: any;
 };
 
 export default async function handler(
@@ -29,7 +31,7 @@ export default async function handler(
             userId: body.userId,
           },
         });
-        res.status(200).json({ newMaterial });
+        res.status(200).json({materials: [newMaterial]});
       } else if (req.method === "PUT") {
         const { body } = req;
         const newMaterial = await prisma.material.update({
@@ -39,10 +41,10 @@ export default async function handler(
             updatedAt: new Date(),
           },
         });
-        res.status(200).json({ newMaterial });
+        res.status(200).json({materials: [newMaterial]});
       } 
       else {
-        res.status(405).json({ response: "method not allowed" });
+        res.status(405).json({ message: "method not allowed" });
       }
     }
   }

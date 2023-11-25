@@ -4,7 +4,7 @@ import { mutate } from "swr";
 
 interface UsuarioModalProps {
   name: string;
-  email: string;
+  email: string | undefined;
 }
 
 export const UsuarioModal = async ({ name, email }: UsuarioModalProps) => {

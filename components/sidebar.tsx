@@ -10,13 +10,13 @@ const Sidebar = () => {
   const router = useRouter();
   const currentPath = router.pathname;
   const { data, status } = useSession();
-  const user = data?.user;
+  const user: any = data?.user;
   const userRole = data?.user.role?.name;
 
   if (status === "loading") return <div>Cargando...</div>;
   if (status === "unauthenticated") return <div>Debes iniciar sesión</div>;
 
-  const UserRoleBadge = ({ role }: { role: string }) => {
+  const UserRoleBadge = ({ role }: { role: string | undefined }) => {
     if (role === "ADMIN") {
       return (
         <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">

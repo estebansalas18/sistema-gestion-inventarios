@@ -51,6 +51,7 @@ const Materiales = () => {
               headers={materiales_header}
               rows={materials.materials}
               fieldsToShow={materiales_fields}
+              onClick={() => {}}
             />
           </div>
         </div>

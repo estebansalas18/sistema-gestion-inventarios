@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SERVER_URL_REST = process.env.NEXT_PUBLIC_SUPABASE_URL_REST;
-const API_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; // Lee la clave de API desde .env
-const SERVER_URL_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const API_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""; // Lee la clave de API desde .env
+const SERVER_URL_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
 const SERVER_URL = '/api';
 
@@ -21,7 +21,7 @@ const API_ROUTES = {
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const fetcherSupabase = async (url) => {
+const fetcherSupabase = async (url: any) => {
   const headers = new Headers();
   const apiKey = API_KEY;
   if (apiKey) {
@@ -34,7 +34,7 @@ const fetcherSupabase = async (url) => {
     const response = await fetch(apiUrl, { headers });
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`Error fetching data: ${error.message}`);
   }
 };

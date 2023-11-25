@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
 
 interface InventoryMovement {
-  id: number;
-  date: string;
+  id: string;
+  date: Date;
   movementType: string;
   quantity: number;
-  materialId: number;
-  userId: number;
+  materialId: string;
+  userId: string;
 }
 
 interface InventoryChartProps {
-  selectedMaterial: number | null;
+  selectedMaterial: string | undefined;
   inventory: InventoryMovement[];
 }
 
@@ -43,7 +43,7 @@ const InventoryChart: React.FC<InventoryChartProps> = ({
     let currentBalance = 0;
 
     filteredMovements.forEach((movement) => {
-      dates.push(movement.date);
+      dates.push(movement.date.toLocaleString());
       if (movement.movementType === "ENTRADA") {
         currentBalance += movement.quantity;
       } else if (movement.movementType === "SALIDA") {
@@ -145,4 +145,4 @@ const InventoryChart: React.FC<InventoryChartProps> = ({
   );
 };
 
-export { InventoryChart} ;
+export { InventoryChart };
