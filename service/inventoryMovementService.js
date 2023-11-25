@@ -2,7 +2,7 @@
 import { supabase } from "./apiConfig";
 import { MaterialService } from "@/service/materialservice";
 import { v4 as uuidv4 } from 'uuid';
-
+import Swal from "sweetalert2";
 
 const InventoryMovementService = {
 
@@ -22,17 +22,18 @@ const InventoryMovementService = {
       throw error;
     }
   },
-  
+
   createInventoryMovement: async (movementType, quantity, materialId, userId) => {
-    try { 
+    try {
+      // Obtener el saldo actual del material
       const materialBalance = await MaterialService.getMaterialBalance(materialId);
 
-      // Validar si es un movimiento de salida y la cantidad es mayor al saldo
+      // Validar si la cantidad de salida es mayor al saldo
       if (movementType === "SALIDA" && quantity > materialBalance) {
-        throw ("La cantidad de salida es mayor al saldo del material");
-        return null; // Devolver null o algún valor indicativo de error
+        // Muestra un toast indicando que la cantidad de salida es mayor al saldo
+        throw { toast: "La cantidad de salida es mayor al saldo actual del material", type: "error" };
       }
-      
+
       // Crear el movimiento de inventario
       const movementId = uuidv4();
       const { data: newMovement, error: movementError } = await supabase
@@ -50,19 +51,48 @@ const InventoryMovementService = {
         .select();
 
       if (movementError) {
-        console.log("Se vino derecho")
-        throw "Se vino derecho";
+        throw "Error al insertar el movimiento de inventario";
       }
 
-      // Actualizar el saldo del material
-      await supabase
-        .from("Material")
-        .update({ quantity: materialBalance })
-        .eq("id", materialId);
+      // Actualizar el saldo del material solo en caso de salida
+      if (movementType === "SALIDA") {
+        await supabase
+          .from("Material")
+          .update({ quantity: materialBalance - quantity })
+          .eq("id", materialId);
+      }
+
+      if (movementType === "ENTRADA") {
+        await supabase
+          .from("Material")
+          .update({ quantity: materialBalance + quantity })
+          .eq("id", materialId);
+      }
 
       return newMovement[0];
     } catch (error) {
       console.error("Error al crear el movimiento de inventario:", error);
+
+      // Verifica si el error es un toast y lo muestra
+      if (error.toast) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+
+        Toast.fire({
+          icon: error.type || "error",
+          title: error.toast,
+        });
+      }
+
       throw error;
     }
   },
