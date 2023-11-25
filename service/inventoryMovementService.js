@@ -1,6 +1,6 @@
 // inventoryMovementService.js
 import { supabase } from "./apiConfig";
-import MaterialService from "@/service/materialservice";
+import { MaterialService } from "@/service/materialservice";
 import { v4 as uuidv4 } from 'uuid';
 
 

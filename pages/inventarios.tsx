@@ -1,37 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Sidebar } from "../components/sidebar";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { useSession } from "next-auth/react";
-import { inventarios_header } from "../data/arrays";
+import React, { useState, useEffect } from "react";
+import { Sidebar } from "@/components/sidebar";
+import { inventarios_header } from "@/data/arrays";
 import { Title } from "@/components/title";
 import useSWR, { mutate } from "swr";
 import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { Dropdown } from "@/components/dropdown";
-import InventoryChart from "@/components/diagram";
-import { Loading } from "@/components/loading";
-import { Error } from "@/components/error";
+import { InventoryChart } from "@/components/diagram";
 import { Button } from "@/components/button";
 import InventarioModal from "@/components/modales/inventarioModal";
-import MaterialService from "@/service/materialservice";
-import InventoryMovementService from "@/service/inventoryMovementService";
+import { MaterialService } from "@/service/materialservice";
+import { InventoryMovementService } from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
 import { PrivateRoute } from "@/components/PrivateRoute";
-import { PrivateComponent } from "@/components/PrivateComponent";
 
 interface InventoryContentProps {
-  inventory: {
-    id: string;
-    movementType: string;
-    quantity: number;
-    materialId: string;
-    userId: string;
-    date: Date;
-  }[];
+  inventory: InventoryMovement[];
 }
 
 const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const [materialQuantity, setMaterialQuantity] = useState(0);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [selectedMaterial, setSelectedMaterial] = useState<string>();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const {
@@ -40,8 +28,6 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     isLoading,
   } = useSWR(API_ROUTES.materials, fetcher);
 
-  if (isLoading) return <div> cargando... </div>;
-  if (materialsError) return <div> No se pudieron cargar los materiales </div>;
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
@@ -54,26 +40,29 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchMaterialQuantity();
-  // }, [selectedMaterial, inventory]);
+  useEffect(() => {
+    fetchMaterialQuantity();
+  }, [selectedMaterial, inventory]);
+
+  if (isLoading) return <div> cargando... </div>;
+  if (materialsError) return <div> No se pudieron cargar los materiales </div>;
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
   }
 
-  const handleDropdownToggle = () => {
+  const handleDropdownToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     setDropdownOpen((prevOpen) => !prevOpen);
   };
 
-  const handleMaterialSelect = (materialId) => {
+  const handleMaterialSelect = (materialId: string) => {
     setSelectedMaterial(materialId);
     setDropdownOpen(false);
   };
 
-  const uniqueMaterialIds = [
-    ...new Set(inventory.map((movement) => movement.materialId)),
-  ];
+  const uniqueMaterialIds = Array.from(
+    new Set(inventory.map((movement) => movement.materialId))
+  );
 
   const revalidateMovements = async () => {
     // Actualiza los datos llamando a la función `mutate` de useSWR
@@ -93,7 +82,8 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
             selectedMaterial
               ? `Material seleccionado: ${
                   materials.materials.find(
-                    (material) => material.id === selectedMaterial
+                    (material: { id: string }) =>
+                      material.id === selectedMaterial
                   )?.name || `Material ${selectedMaterial}`
                 }`
               : "Selecciona un Material"
@@ -115,10 +105,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                 InventarioModal({
                   name:
                     materials.materials.find(
-                      (material) => material.id === selectedMaterial
+                      (material: { id: string }) =>
+                        material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
-                  revalidateMovements: () =>
-                    mutate(API_ROUTES.inventoryMovementsSupabase),
+                  revalidateMovements: () => mutate(API_ROUTES.inventory),
                 });
               }}
               disabled={!selectedMaterial}
@@ -148,7 +138,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                           className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                         >
                           <td className="px-6 py-4">{movement.id}</td>
-                          <td className="px-6 py-4">{movement.date}</td>
+                          <td className="px-6 py-4">
+                            {movement.date.toLocaleString()}
+                          </td>
                           <td className="px-6 py-4">
                             {movement.movementType === "ENTRADA"
                               ? movement.quantity
@@ -191,25 +183,18 @@ const InventoryWrapper = () => {
 };
 
 const Inventarios = () => {
-  const { data, status } = useSession();
   const {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
   } = useSWR(API_ROUTES.inventory, fetcher);
 
-  const user = data?.user;
-
-  if (status === "loading") return <Loading />;
-  //if (error) return <div>{error.message}</div>;
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
-
   const inventarioArray: InventoryMovement[] = Object.values(
     inventory.inventoryMovements
   );
-  if (user) return <InventoryContent inventory={inventarioArray} />;
-  return <Error />;
+  return <InventoryContent inventory={inventarioArray} />;
 };
 
 export default InventoryWrapper;

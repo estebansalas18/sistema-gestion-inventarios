@@ -9,15 +9,14 @@ type Data = {
 };
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<Data>
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
 ) {
-    await checkPrivateApi(req, res)
+    await checkPrivateApi(req, res);
     if (req.method === "GET") {
-        const inventoryMovements = await prisma.inventoryMovement.findMany();
-        res.status(200).json({ inventoryMovements });
-    }
-    else if (req.method === "POST"){
+      const inventoryMovements = await prisma.inventoryMovement.findMany();
+      res.status(200).json({ inventoryMovements });
+    } else if (req.method === "POST"){
         const { body } = req;    
         const newInventoryMovement: InventoryMovement = await prisma.inventoryMovement.create({
           data: {
@@ -32,5 +31,6 @@ export default async function handler(
     }
     else{
         res.status(405).json({ message: 'method not allowed' });
-    }    
+    }   
 }
+

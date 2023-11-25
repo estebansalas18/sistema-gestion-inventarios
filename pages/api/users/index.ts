@@ -4,14 +4,15 @@ import { prisma } from "@/service/prisma";
 import { checkProtectedApi } from "@/utils/checkServerSession";
 
 type Data = {
-    users: User[];
+    users?: User[];
+    message?: string;
+    error?: any;
 };
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
-
   try{    
     await checkProtectedApi(req, res, 'ADMIN');
 
@@ -31,7 +32,7 @@ export default async function handler(
           },
         });
     
-        res.status(200).json({ newUser });
+        res.status(200).json({ users: [newUser] });
     } 
     else if (req.method === 'PUT') {
         const { body } = req;    
@@ -41,10 +42,10 @@ export default async function handler(
             roleId: body.roleId,
           }
         });    
-        res.status(200).json({ newUser });
+        res.status(200).json({ users: [newUser] });
     } 
     else {
-        res.status(405).json({ response: 'method not allowed' });
+        res.status(405).json({ message: 'method not allowed' });
     }
   }
   catch(error){

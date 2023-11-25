@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import MaterialService from "@/service/materialservice";
+import { MaterialService } from "@/service/materialservice";
 import { InventoryMovementService } from "@/service/inventoryMovementService";
 
 const MaterialModal = async (revalidateCallback: {

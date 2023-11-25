@@ -1,14 +1,14 @@
 import { useRef, useEffect } from "react";
 
 interface DropdownProps {
-  materialIds: number[];
+  materialIds: string[];
   materials: Array<{
-    id: number;
+    id: string;
     name: string;
   }>;
-  onSelect: (materialId: number) => void;
+  onSelect: (materialId: string) => void;
   isOpen: boolean;
-  handleDropdownToggle: () => void;
+  handleDropdownToggle: (event: React.MouseEvent<HTMLButtonElement>) => void;
   toggleDropdown: (isOpen: boolean) => void;
 }
 
@@ -81,13 +81,12 @@ const Dropdown = ({
 
             return (
               <li key={materialId}>
-                <a
-                  href="#"
+                <button
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   onClick={() => onSelect(materialId)}
                 >
                   {materialInfo ? materialInfo.name : `Material ${materialId}`}
-                </a>
+                </button>
               </li>
             );
           })}
