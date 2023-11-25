@@ -9,11 +9,13 @@ interface InventarioModalProps {
 interface InventarioModalProps {
   name: string;
   revalidateMovements: () => void;
+  userId: string;
 }
 
 const InventarioModal = async ({
   name,
   revalidateMovements,
+  userId,
 }: InventarioModalProps): Promise<void> => {
   const { value: formValues, isConfirmed } = await Swal.fire({
     title: "Agregar Movimiento para " + name,
@@ -66,7 +68,7 @@ const InventarioModal = async ({
           movementType,
           saldoInt,
           materialId,
-          "test2"
+          userId
         );
         // Invocar la función de devolución de llamada para revalidar los datos
         revalidateMovements();

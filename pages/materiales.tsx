@@ -9,6 +9,7 @@ import { Button } from "@/components/button";
 import { Title } from "@/components/title";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { PrivateComponent } from "@/components/PrivateComponent";
+import { useSession } from "next-auth/react";
 
 const MaterialsWrapper = () => {
   return (
@@ -24,6 +25,12 @@ const Materiales = () => {
     error: materialsError,
     isLoading: materialssLoading,
   } = useSWR(API_ROUTES.materials, fetcher);
+  const { data, status } = useSession();
+  if (status !== "authenticated") return <div>Cargando...</div>;
+  const user = data.user;
+  const { data: userData, isLoading: userLoading } = useSWR(API_ROUTES.users + "/" + user.email, fetcher);
+  if (userLoading) return <Loading />;  
+  const userId = userData.user.id;
 
   const revalidateMaterials = async () => {
     // Actualiza los datos llamando a la función `mutate` de useSWR
@@ -42,7 +49,7 @@ const Materiales = () => {
             <div className="text-right">
               <Button
                 text="Agregar Material"
-                onClick={() => MaterialModal(revalidateMaterials)}
+                onClick={() => MaterialModal(revalidateMaterials, userId)}
               />
             </div>
           </PrivateComponent>

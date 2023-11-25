@@ -12,6 +12,8 @@ import { MaterialService } from "@/service/materialservice";
 import { InventoryMovementService } from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
 import { PrivateRoute } from "@/components/PrivateRoute";
+import { useSession } from "next-auth/react";
+import { Loading } from "@/components/loading";
 
 interface InventoryContentProps {
   inventory: InventoryMovement[];
@@ -27,6 +29,13 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
     error: materialsError,
     isLoading,
   } = useSWR(API_ROUTES.materials, fetcher);
+
+  const { data, status } = useSession();
+  if (status !== "authenticated") return <div>Cargando...</div>;
+  const user = data.user;
+  const { data: userData, isLoading: userLoading } = useSWR(API_ROUTES.users + "/" + user.email, fetcher);
+  if (userLoading) return <Loading />;  
+  const userId = userData.user.id;
 
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
@@ -109,6 +118,7 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
                         material.id === selectedMaterial
                     )?.name || `Material ${selectedMaterial}`,
                   revalidateMovements: () => mutate(API_ROUTES.inventory),
+                  userId,
                 });
               }}
               disabled={!selectedMaterial}
