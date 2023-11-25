@@ -2,10 +2,13 @@ import Swal from "sweetalert2";
 import { MaterialService } from "@/service/materialservice";
 import { InventoryMovementService } from "@/service/inventoryMovementService";
 
-const MaterialModal = async (revalidateCallback: {
-  (): Promise<void>;
-  (): void;},
-  userId: string) => {
+const MaterialModal = async (
+  revalidateCallback: {
+    (): Promise<void>;
+    (): void;
+  },
+  userId: string
+) => {
   const { value: formValues, dismiss } = await Swal.fire({
     title: "Agregar Material",
     html: `

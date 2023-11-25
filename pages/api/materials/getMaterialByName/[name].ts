@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try{
         await checkPrivateApi(req, res);
         const { name } = req.query;
-        const singleName = Array.isArray(name) ? name[0] : name;
+        const singleName = Array.isArray(name) ? name[0] : name;
         const material = await prisma.material.findUnique({
             where: {
                 name: singleName,

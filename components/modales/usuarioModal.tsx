@@ -38,6 +38,7 @@ export const UsuarioModal = async ({ name, email }: UsuarioModalProps) => {
       fetch(API_ROUTES.users, options)
         .then((response) => {})
         .then(() => {
+          window.location.reload();
           mutate(API_ROUTES.users);
           Swal.fire("Usuario actualizado correctamente", "", "success");
         })

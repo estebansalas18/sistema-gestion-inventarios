@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/service/prisma";
-import { checkProtectedApi } from "@/utils/checkServerSession";
+import { checkPrivateApi } from "@/utils/checkServerSession";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  await checkProtectedApi(req, res, "ADMIN");
+  await checkPrivateApi(req, res);
   const { email } = req.query;
   if (typeof email === "string") {
     const user = await prisma.user.findUnique({

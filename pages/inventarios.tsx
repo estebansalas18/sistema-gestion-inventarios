@@ -48,11 +48,13 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const { data, status } = useSession();
   if (status !== "authenticated") return <div>Cargando...</div>;
   const user = data.user;
-  const { data: userData, isLoading: userLoading } = useSWR(API_ROUTES.users + "/" + user.email, fetcher);
-  if (userLoading) return <Loading />;  
+  const { data: userData, isLoading: userLoading } = useSWR(
+    API_ROUTES.users + "/" + user.email,
+    fetcher
+  );
+  if (userLoading) return <Loading />;
   const userId = userData.user.id;
 
-  
   if (isLoading) return <div> cargando... </div>;
   if (materialsError) return <div> No se pudieron cargar los materiales </div>;
 
