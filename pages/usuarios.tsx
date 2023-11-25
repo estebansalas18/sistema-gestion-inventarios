@@ -8,14 +8,13 @@ import { Title } from "@/components/title";
 import { UsuarioModal } from "@/components/modales/usuarioModal";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-
 const UsersPageWrapper = () => {
-  return(
-  <ProtectedRoute roleName="ADMIN">
-    <Usuarios />
-  </ProtectedRoute>
+  return (
+    <ProtectedRoute roleName="ADMIN">
+      <Usuarios />
+    </ProtectedRoute>
   );
-}
+};
 
 const Usuarios = () => {
   const {
@@ -28,7 +27,7 @@ const Usuarios = () => {
   if (usersError) return <div>Error al cargar los usuarios</div>;
   const users = usersData.users;
   return (
-    <ProtectedRoute roleName="ADMIN">        
+    <ProtectedRoute roleName="ADMIN">
       <div className="flex">
         <Sidebar />
         <div className="flex-1 mt-20 pl-80">
@@ -40,8 +39,10 @@ const Usuarios = () => {
                 rows={users}
                 fieldsToShow={usuarios_fields}
                 actions={true}
-                onClick={(row) => UsuarioModal({ name: row.name, email:row.email })}
-                />
+                onClick={(row) =>
+                  UsuarioModal({ name: row.name, email: row.email })
+                }
+              />
             </div>
           </div>
         </div>

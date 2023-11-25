@@ -11,7 +11,10 @@ interface InventarioModalProps {
   revalidateMovements: () => void;
 }
 
-const InventarioModal = async ({ name, revalidateMovements }: InventarioModalProps): Promise<void> => {
+const InventarioModal = async ({
+  name,
+  revalidateMovements,
+}: InventarioModalProps): Promise<void> => {
   const { value: formValues, isConfirmed } = await Swal.fire({
     title: "Agregar Movimiento para " + name,
     html: `
@@ -25,10 +28,13 @@ const InventarioModal = async ({ name, revalidateMovements }: InventarioModalPro
     confirmButtonText: "Agregar Movimiento",
     focusConfirm: false,
     preConfirm: async () => {
-      const saldoInput = Swal.getPopup()?.querySelector("#saldo") as HTMLInputElement;
+      const saldoInput = Swal.getPopup()?.querySelector(
+        "#saldo"
+      ) as HTMLInputElement;
 
-      
-      const movementTypeInput = Swal.getPopup()?.querySelector("#movementType") as HTMLSelectElement;
+      const movementTypeInput = Swal.getPopup()?.querySelector(
+        "#movementType"
+      ) as HTMLSelectElement;
 
       if (!saldoInput || !movementTypeInput) {
         Swal.showValidationMessage("Completa todos los campos");
@@ -97,4 +103,4 @@ const InventarioModal = async ({ name, revalidateMovements }: InventarioModalPro
   }
 };
 
-export { InventarioModal };
+export default InventarioModal;

@@ -3,7 +3,7 @@ import { RolesQuery } from '@/types';
 import useSWR from 'swr';
 
 const useGetRoles = () => {
-  const { data, isLoading } = useSWR<RolesQuery>(API_ROUTES.roles, fetcher);
+  const { data, isLoading } = useSWR<RolesQuery>(API_ROUTES.rolesSupabase, fetcher);
 
   return { roles: data?.roles, rolesLoading: isLoading };
 };

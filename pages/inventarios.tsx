@@ -7,7 +7,7 @@ import { API_ROUTES, fetcher } from "@/service/apiConfig";
 import { Dropdown } from "@/components/dropdown";
 import { InventoryChart } from "@/components/diagram";
 import { Button } from "@/components/button";
-import { InventarioModal } from "@/components/modales/inventarioModal";
+import InventarioModal from "@/components/modales/inventarioModal";
 import { MaterialService } from "@/service/materialservice";
 import { InventoryMovementService } from "@/service/inventoryMovementService";
 import { InventoryMovement } from "@prisma/client";
@@ -15,13 +15,13 @@ import { PrivateRoute } from "@/components/PrivateRoute";
 
 interface InventoryContentProps {
   inventory: {
-  id: string;
+    id: string;
     movementType: string;
     quantity: number;
     materialId: string;
     userId: string;
     date: Date;
-  }[];  
+  }[];
 }
 
 const InventoryContent = ({ inventory }: InventoryContentProps) => {
@@ -29,14 +29,17 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { data: materials, error: materialsError, isLoading } = useSWR(
-    API_ROUTES.materials, fetcher
-  );
+  const {
+    data: materials,
+    error: materialsError,
+    isLoading,
+  } = useSWR(API_ROUTES.materials, fetcher);
 
   const fetchMaterialQuantity = async () => {
     if (selectedMaterial) {
       try {
-        const quantity = await MaterialService.getMaterialQuantity(selectedMaterial);
+        const quantity =
+          await MaterialService.getMaterialQuantity(selectedMaterial);
         setMaterialQuantity(quantity);
       } catch (error) {
         console.error("Error al obtener la cantidad del material:", error);
@@ -46,12 +49,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 
   useEffect(() => {
     fetchMaterialQuantity();
- }, [selectedMaterial, inventory]);
+  }, [selectedMaterial, inventory]);
 
- 
   if (isLoading) return <div> cargando... </div>;
   if (materialsError) return <div> No se pudieron cargar los materiales </div>;
-
 
   if (materialsError) {
     return <div>Error al cargar los materiales</div>;
@@ -72,7 +73,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 
   const revalidateMovements = async () => {
     // Actualiza los datos llamando a la función `mutate` de useSWR
-    mutate(API_ROUTES.inventoryMovementsSupabase, InventoryMovementService.getAllInventoryMovements);
+    mutate(
+      API_ROUTES.inventoryMovementsSupabase,
+      InventoryMovementService.getAllInventoryMovements
+    );
   };
 
   return (
@@ -84,8 +88,9 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
           subtitle={
             selectedMaterial
               ? `Material seleccionado: ${
-                  materials.materials.find((material) => material.id === selectedMaterial)
-                    ?.name || `Material ${selectedMaterial}`
+                  materials.materials.find(
+                    (material) => material.id === selectedMaterial
+                  )?.name || `Material ${selectedMaterial}`
                 }`
               : "Selecciona un Material"
           }
@@ -101,20 +106,19 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
               toggleDropdown={setDropdownOpen}
             />
             <Button
-                text="Agregar Movimiento"
-                onClick={() => {
-                  InventarioModal({
-                    name:
-                      materials.materials.find(
-                        (material) => material.id === selectedMaterial
-                      )?.name || `Material ${selectedMaterial}`,
-                    revalidateMovements: () => mutate(API_ROUTES.inventory),
-
-                  });
-                }}
-                disabled={!selectedMaterial}
-                title="Selecciona un material antes de agregar un movimiento."
-              />
+              text="Agregar Movimiento"
+              onClick={() => {
+                InventarioModal({
+                  name:
+                    materials.materials.find(
+                      (material) => material.id === selectedMaterial
+                    )?.name || `Material ${selectedMaterial}`,
+                  revalidateMovements: () => mutate(API_ROUTES.inventory),
+                });
+              }}
+              disabled={!selectedMaterial}
+              title="Selecciona un material antes de agregar un movimiento."
+            />
           </div>
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -158,10 +162,10 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
             </table>
           </div>
           <div className="justify-end mt-10">
-          <Title
-            title={`Cantidad del material seleccionado: ${materialQuantity}`}
-            subtitle="Saldo total"
-          />
+            <Title
+              title={`Cantidad del material seleccionado: ${materialQuantity}`}
+              subtitle="Saldo total"
+            />
             <InventoryChart
               selectedMaterial={selectedMaterial}
               inventory={inventory}
@@ -174,24 +178,26 @@ const InventoryContent = ({ inventory }: InventoryContentProps) => {
 };
 
 const InventoryWrapper = () => {
-   return(
+  return (
     <PrivateRoute>
       <Inventarios />
     </PrivateRoute>
-   );
-}
+  );
+};
 
-const Inventarios = () => {  
+const Inventarios = () => {
   const {
     data: inventory,
     error: inventoryError,
     isLoading: inventoryIsLoading,
-  } = useSWR(API_ROUTES.inventory, fetcher);  
+  } = useSWR(API_ROUTES.inventory, fetcher);
 
   if (inventoryIsLoading) return <div>Cargando inventario...</div>;
   if (inventoryError) return <div>No se pudieron cargar los materiales</div>;
-  const inventarioArray: InventoryMovement[] = Object.values(inventory.inventoryMovements);
-  return <InventoryContent inventory={inventarioArray} />
+  const inventarioArray: InventoryMovement[] = Object.values(
+    inventory.inventoryMovements
+  );
+  return <InventoryContent inventory={inventarioArray} />;
 };
 
 export default InventoryWrapper;

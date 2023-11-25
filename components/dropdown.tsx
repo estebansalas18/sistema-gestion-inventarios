@@ -20,7 +20,7 @@ const Dropdown = ({
   handleDropdownToggle,
   toggleDropdown,
 }: DropdownProps) => {
-  const dropdownButtonRef = useRef();
+  const dropdownButtonRef = useRef<HTMLButtonElement | null>();
 
   useEffect(() => {
     const handleOutsideClick = (event: { target: any }) => {

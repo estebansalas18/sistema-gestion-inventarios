@@ -1,6 +1,6 @@
 import React from "react";
 import { FaBox, FaUser, FaLemon, FaSignOutAlt } from "react-icons/fa";
-import { useSession, signOut  } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,12 +9,12 @@ import { PrivateComponent } from "./PrivateComponent";
 const Sidebar = () => {
   const router = useRouter();
   const currentPath = router.pathname;
-  const { data , status} = useSession();
+  const { data, status } = useSession();
   const user = data?.user;
   const userRole = data?.user.role?.name;
 
-  if(status === "loading") return <div>Cargando...</div>;
-  if(status === "unauthenticated") return <div>Debes iniciar sesión</div>;
+  if (status === "loading") return <div>Cargando...</div>;
+  if (status === "unauthenticated") return <div>Debes iniciar sesión</div>;
 
   const UserRoleBadge = ({ role }: { role: string }) => {
     if (role === "ADMIN") {
@@ -46,13 +46,14 @@ const Sidebar = () => {
             src={user?.image || ""}
             alt="Foto de Usuario"
             className="w-44 h-44 rounded-full mb-3 mt-20"
-            width={150} height={150}
+            width={150}
+            height={150}
           />
           <div className="text-center">
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {user?.name}
             </p>
-            <span>              
+            <span>
               <UserRoleBadge role={userRole} />
             </span>
           </div>
@@ -60,16 +61,17 @@ const Sidebar = () => {
 
         <ul className="space-y-2 font-medium mt-20">
           <li>
-            <Link href="/inventarios"
+            <Link
+              href="/inventarios"
               className={`flex items-center p-3 text-xl rounded-lg ${
                 currentPath === "/inventarios"
                   ? "text-gray-100 bg-gray-500"
                   : "text-gray-500 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               } group`}
             >
-                <FaBox className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ms-3">Inventarios</span>
-            </Link>            
+              <FaBox className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+              <span className="ms-3">Inventarios</span>
+            </Link>
           </li>
           <li>
             <Link
@@ -83,25 +85,27 @@ const Sidebar = () => {
               <FaLemon className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
               <span className="ms-3">Materiales</span>
             </Link>
-          </li>          
+          </li>
           <PrivateComponent roleName="ADMIN">
             <li>
-                <Link
-                  href="/usuarios"
-                  className={`flex items-center p-3 text-xl rounded-lg ${
-                    currentPath === "/usuarios"
-                      ? "text-gray-100 bg-gray-500"
-                      : "text-gray-500 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  } group`}
-                >
-                  <FaUser className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                  <span className="ms-3">Usuarios</span>
-                </Link>
-              </li>
-            </PrivateComponent>
+              <Link
+                href="/usuarios"
+                className={`flex items-center p-3 text-xl rounded-lg ${
+                  currentPath === "/usuarios"
+                    ? "text-gray-100 bg-gray-500"
+                    : "text-gray-500 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                } group`}
+              >
+                <FaUser className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                <span className="ms-3">Usuarios</span>
+              </Link>
+            </li>
+          </PrivateComponent>
           <li>
-            <button 
-              onClick={() => {signOut()}}
+            <button
+              onClick={() => {
+                signOut({ callbackUrl: "/" });
+              }}
               type="button"
               className="flex items-center w-full p-3 text-xl text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
